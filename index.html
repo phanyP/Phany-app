@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<!-- saved from url=(0058)file:///C:/Users/stephanie.pelard/Downloads/phany_app.html -->
+<html lang="fr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Mon App">
+<title>Mon App — Phany</title>
+<link href="./Mon App — Phany_files/css2" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --rose-light: #FBEAF0;
+    --rose-mid: #ED93B1;
+    --rose-dark: #72243E;
+    --mint-light: #E1F5EE;
+    --mint-mid: #5DCAA5;
+    --mint-dark: #085041;
+    --peach-light: #FAECE7;
+    --peach-mid: #F0997B;
+    --peach-dark: #712B13;
+    --lav-light: #EEEDFE;
+    --lav-mid: #AFA9EC;
+    --lav-dark: #3C3489;
+    --warm-light: #FAEEDA;
+    --warm-mid: #EF9F27;
+    --warm-dark: #633806;
+    --bg: #FDF8F6;
+    --surface: #FFFFFF;
+    --border: rgba(0,0,0,0.08);
+    --text: #2C2C2A;
+    --text-muted: #888780;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .header {
+    padding: 52px 20px 16px;
+    background: var(--bg);
+    flex-shrink: 0;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--rose-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .header-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .header-date {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    padding: 12px 20px 0;
+    overflow-x: auto;
+    flex-shrink: 0;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab {
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+  }
+  .tab.active { font-weight: 500; }
+
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px 32px;
+    scrollbar-width: none;
+  }
+  .content::-webkit-scrollbar { display: none; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  input[type="text"], input[type="time"], input[type="date"], textarea, select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    margin-bottom: 8px;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--rose-mid);
+  }
+  textarea {
+    resize: none;
+    line-height: 1.6;
+  }
+
+  .btn {
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .btn:active { opacity: 0.7; }
+
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .color-select {
+    flex: 1;
+  }
+
+  .task-card {
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    position: relative;
+  }
+
+  .task-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .task-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+
+  .task-name {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .task-name.done {
+    text-decoration: line-through;
+    opacity: 0.5;
+  }
+
+  .delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    opacity: 0.35;
+    padding: 0 2px;
+    line-height: 1;
+    color: inherit;
+  }
+
+  .steps {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .step-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 5px 0;
+  }
+
+  .step-text {
+    font-size: 13px;
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .step-text.done {
+    text-decoration: line-through;
+    opacity: 0.45;
+  }
+
+  /* Custom checkbox */
+  .check {
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    border: 1.5px solid rgba(0,0,0,0.2);
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    -webkit-appearance: none;
+    appearance: none;
+    margin-top: 1px;
+  }
+  .check:checked {
+    background: var(--rose-mid);
+    border-color: var(--rose-mid);
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4l3 3 5-6' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-size: 60%;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .empty-state {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px 20px;
+    line-height: 1.7;
+  }
+
+  .win-card {
+    background: var(--mint-light);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .win-text {
+    font-size: 14px;
+    color: var(--mint-dark);
+    flex: 1;
+    line-height: 1.5;
+  }
+
+  .win-date {
+    font-size: 12px;
+    color: var(--mint-mid);
+    margin-top: 3px;
+  }
+
+  /* Calendar */
+  .cal-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+
+  .cal-nav-btn {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 4px 8px;
+    border-radius: 8px;
+  }
+  .cal-nav-btn:active { background: var(--bg); }
+
+  .cal-month-label {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .cal-days-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 6px;
+  }
+
+  .cal-day-label {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    padding: 4px 0;
+  }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+
+  .cal-cell {
+    text-align: center;
+    padding: 7px 2px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.1s;
+  }
+  .cal-cell:active { background: var(--rose-light); }
+  .cal-cell.today {
+    background: var(--rose-light);
+    color: var(--rose-dark);
+    font-weight: 500;
+  }
+  .cal-cell.has-event::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--rose-mid);
+  }
+
+  .event-item {
+    background: var(--peach-light);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .event-text { font-size: 14px; color: var(--peach-dark); }
+  .event-date { font-size: 12px; color: var(--peach-mid); margin-top: 2px; }
+
+  .reminder-item {
+    background: var(--warm-light);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .reminder-text { font-size: 14px; color: var(--warm-dark); }
+  .reminder-time { font-size: 12px; color: var(--warm-mid); margin-top: 2px; }
+
+  .notif-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  .section-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 16px 0 8px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="header-top">
+      <div class="avatar">🌸</div>
+      <div>
+        <div class="header-name">Bonjour Phany</div>
+        <div class="header-date" id="dateDisplay">vendredi 27 mars</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" id="tab-today" onclick="showTab(&#39;today&#39;)">Aujourd'hui</button>
+    <button class="tab" id="tab-tomorrow" onclick="showTab(&#39;tomorrow&#39;)">Demain</button>
+    <button class="tab" id="tab-wins" onclick="showTab(&#39;wins&#39;)">Victoires</button>
+    <button class="tab" id="tab-calendar" onclick="showTab(&#39;calendar&#39;)">Calendrier</button>
+    <button class="tab" id="tab-reminders" onclick="showTab(&#39;reminders&#39;)">Rappels</button>
+  </div>
+
+  <div class="content">
+
+    <!-- AUJOURD'HUI -->
+    <div class="panel active" id="panel-today">
+      <div class="card">
+        <div class="card-title">Nouvelle tâche</div>
+        <input type="text" id="taskName" placeholder="Nom de la tâche...">
+        <textarea id="taskSteps" rows="3" placeholder="Étapes à suivre (une par ligne)..."></textarea>
+        <div class="btn-row">
+          <select id="taskColor" class="color-select">
+            <option value="rose">Rose</option>
+            <option value="mint">Menthe</option>
+            <option value="peach">Pêche</option>
+            <option value="lav">Lavande</option>
+            <option value="warm">Doré</option>
+          </select>
+          <button class="btn" style="background: var(--rose-light); color: var(--rose-dark);" onclick="addTask(&#39;today&#39;)">Ajouter</button>
+        </div>
+      </div>
+      <div id="today-tasks"><div class="empty-state">Aucune tâche pour le moment.<br>Ajoute ta première tâche ci-dessus !</div></div>
+    </div>
+
+    <!-- DEMAIN -->
+    <div class="panel" id="panel-tomorrow">
+      <div class="card">
+        <div class="card-title">Préparer demain</div>
+        <input type="text" id="tomorrowTask" placeholder="Ce que je veux faire demain...">
+        <textarea id="tomorrowSteps" rows="3" placeholder="Étapes à suivre (une par ligne)..."></textarea>
+        <button class="btn" style="background: var(--lav-light); color: var(--lav-dark);" onclick="addTask(&#39;tomorrow&#39;)">Ajouter pour demain</button>
+      </div>
+      <div id="tomorrow-tasks"></div>
+    </div>
+
+    <!-- VICTOIRES -->
+    <div class="panel" id="panel-wins">
+      <div class="card">
+        <div class="card-title">Note ta victoire</div>
+        <input type="text" id="winText" placeholder="J&#39;ai réussi à...">
+        <button class="btn" style="background: var(--mint-light); color: var(--mint-dark);" onclick="addWin()">Enregistrer</button>
+      </div>
+      <div id="wins-list"></div>
+    </div>
+
+    <!-- CALENDRIER -->
+    <div class="panel" id="panel-calendar">
+      <div class="card">
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+          <div class="cal-month-label" id="calMonth"></div>
+          <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+        </div>
+        <div class="cal-days-header">
+          <div class="cal-day-label">L</div>
+          <div class="cal-day-label">M</div>
+          <div class="cal-day-label">M</div>
+          <div class="cal-day-label">J</div>
+          <div class="cal-day-label">V</div>
+          <div class="cal-day-label">S</div>
+          <div class="cal-day-label">D</div>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Ajouter un événement</div>
+        <input type="date" id="calEventDate">
+        <input type="text" id="calEventText" placeholder="Description...">
+        <button class="btn" style="background: var(--peach-light); color: var(--peach-dark);" onclick="addCalEvent()">Ajouter</button>
+      </div>
+      <div id="cal-events-list"></div>
+    </div>
+
+    <!-- RAPPELS -->
+    <div class="panel" id="panel-reminders">
+      <div class="card">
+        <div class="card-title">Nouveau rappel</div>
+        <input type="text" id="reminderText" placeholder="Me rappeler de...">
+        <input type="time" id="reminderTime">
+        <button class="btn" style="background: var(--warm-light); color: var(--warm-dark);" onclick="addReminder()">Programmer le rappel</button>
+        <div class="notif-hint" id="notif-status"></div>
+      </div>
+      <div id="reminders-list"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const colorMap = {
+  rose:  { bg: '#FBEAF0', dark: '#72243E', border: '#ED93B133' },
+  mint:  { bg: '#E1F5EE', dark: '#085041', border: '#5DCAA533' },
+  peach: { bg: '#FAECE7', dark: '#712B13', border: '#F0997B33' },
+  lav:   { bg: '#EEEDFE', dark: '#3C3489', border: '#AFA9EC33' },
+  warm:  { bg: '#FAEEDA', dark: '#633806', border: '#EF9F2733' }
+};
+
+const tabColors = {
+  today: 'rose', tomorrow: 'lav', wins: 'mint', calendar: 'peach', reminders: 'warm'
+};
+
+const KEY = 'phany_app_v2';
+let data = { today: [], tomorrow: [], wins: [], calEvents: [], reminders: [] };
+
+function load() {
+  try { const s = localStorage.getItem(KEY); if (s) data = JSON.parse(s); } catch(e) {}
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e) {}
+}
+load();
+
+const now = new Date();
+let calYear = now.getFullYear();
+let calMonth = now.getMonth();
+
+const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+
+document.getElementById('dateDisplay').textContent = now.toLocaleDateString('fr-FR', {
+  weekday: 'long', day: 'numeric', month: 'long'
+});
+
+function showTab(tab) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.remove('active');
+    t.style.background = 'transparent';
+    t.style.color = 'var(--text-muted)';
+    t.style.borderColor = 'var(--border)';
+  });
+  document.getElementById('panel-' + tab).classList.add('active');
+  const btn = document.getElementById('tab-' + tab);
+  btn.classList.add('active');
+  const c = colorMap[tabColors[tab]];
+  btn.style.background = c.bg;
+  btn.style.color = c.dark;
+  btn.style.borderColor = c.dark + '55';
+  if (tab === 'calendar') renderCalendar();
+  if (tab === 'wins') renderWins();
+  if (tab === 'reminders') renderReminders();
+  if (tab === 'today') renderTasks('today');
+  if (tab === 'tomorrow') renderTasks('tomorrow');
+}
+
+function addTask(list) {
+  const nameId = list === 'today' ? 'taskName' : 'tomorrowTask';
+  const stepsId = list === 'today' ? 'taskSteps' : 'tomorrowSteps';
+  const name = document.getElementById(nameId).value.trim();
+  if (!name) return;
+  const steps = document.getElementById(stepsId).value.split('\n').filter(s => s.trim()).map(s => ({ text: s.trim(), done: false }));
+  const color = list === 'today' ? document.getElementById('taskColor').value : 'lav';
+  data[list].push({ id: Date.now(), name, steps, done: false, color });
+  document.getElementById(nameId).value = '';
+  document.getElementById(stepsId).value = '';
+  save(); renderTasks(list);
+}
+
+function renderTasks(list) {
+  const el = document.getElementById(list + '-tasks');
+  if (!data[list].length) {
+    el.innerHTML = '<div class="empty-state">Aucune tâche pour le moment.<br>Ajoute ta première tâche ci-dessus !</div>';
+    return;
+  }
+  el.innerHTML = data[list].map((task, i) => {
+    const c = colorMap[task.color] || colorMap.rose;
+    const stepsHtml = task.steps.length ? `<div class="steps">${task.steps.map((s, si) => `
+      <div class="step-row">
+        <input type="checkbox" class="check" ${s.done ? 'checked' : ''} onchange="toggleStep('${list}',${i},${si})" />
+        <span class="step-text ${s.done ? 'done' : ''}">${s.text}</span>
+      </div>`).join('')}</div>` : '';
+    return `<div class="task-card" style="background:${c.bg};border:1px solid ${c.border};">
+      <div class="task-header">
+        <div class="task-left">
+          <input type="checkbox" class="check" ${task.done ? 'checked' : ''} onchange="toggleTask('${list}',${i})" />
+          <span class="task-name ${task.done ? 'done' : ''}" style="color:${c.dark}">${task.name}</span>
+        </div>
+        <button class="delete-btn" style="color:${c.dark}" onclick="deleteTask('${list}',${i})">×</button>
+      </div>
+      ${stepsHtml}
+    </div>`;
+  }).join('');
+}
+
+function toggleTask(list, i) {
+  data[list][i].done = !data[list][i].done;
+  save(); renderTasks(list);
+}
+function toggleStep(list, ti, si) {
+  data[list][ti].steps[si].done = !data[list][ti].steps[si].done;
+  save(); renderTasks(list);
+}
+function deleteTask(list, i) {
+  data[list].splice(i, 1);
+  save(); renderTasks(list);
+}
+
+function addWin() {
+  const el = document.getElementById('winText');
+  const text = el.value.trim();
+  if (!text) return;
+  data.wins.unshift({ text, date: now.toLocaleDateString('fr-FR') });
+  el.value = ''; save(); renderWins();
+}
+function renderWins() {
+  const el = document.getElementById('wins-list');
+  if (!data.wins.length) {
+    el.innerHTML = '<div class="empty-state">Tes victoires apparaîtront ici.<br>Chaque chose accomplie compte !</div>';
+    return;
+  }
+  el.innerHTML = data.wins.map((w, i) => `
+    <div class="win-card">
+      <div>
+        <div class="win-text">🌟 ${w.text}</div>
+        <div class="win-date">${w.date}</div>
+      </div>
+      <button class="delete-btn" style="color:var(--mint-dark)" onclick="deleteWin(${i})">×</button>
+    </div>`).join('');
+}
+function deleteWin(i) { data.wins.splice(i, 1); save(); renderWins(); }
+
+function renderCalendar() {
+  document.getElementById('calMonth').textContent = months[calMonth] + ' ' + calYear;
+  const grid = document.getElementById('calGrid');
+  const first = new Date(calYear, calMonth, 1);
+  let startDay = first.getDay();
+  startDay = startDay === 0 ? 6 : startDay - 1;
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const todayStr = now.toISOString().split('T')[0];
+  let html = '';
+  for (let i = 0; i < startDay; i++) html += '<div></div>';
+  for (let d = 1; d <= daysInMonth; d++) {
+    const ds = calYear + '-' + String(calMonth + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    const isToday = ds === todayStr;
+    const hasEvent = data.calEvents.some(e => e.date === ds);
+    html += `<div class="cal-cell ${isToday ? 'today' : ''} ${hasEvent ? 'has-event' : ''}" onclick="selectDate('${ds}')">${d}</div>`;
+  }
+  grid.innerHTML = html;
+  renderCalEvents();
+}
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+}
+function selectDate(date) {
+  document.getElementById('calEventDate').value = date;
+}
+function addCalEvent() {
+  const date = document.getElementById('calEventDate').value;
+  const text = document.getElementById('calEventText').value.trim();
+  if (!date || !text) return;
+  data.calEvents.push({ date, text });
+  document.getElementById('calEventText').value = '';
+  save(); renderCalendar();
+}
+function renderCalEvents() {
+  const el = document.getElementById('cal-events-list');
+  if (!data.calEvents.length) { el.innerHTML = ''; return; }
+  const sorted = [...data.calEvents].sort((a,b) => a.date.localeCompare(b.date));
+  el.innerHTML = '<div class="section-label">Tous les événements</div>' + sorted.map((e, i) => `
+    <div class="event-item">
+      <div>
+        <div class="event-text">${e.text}</div>
+        <div class="event-date">${new Date(e.date + 'T12:00').toLocaleDateString('fr-FR', { weekday:'short', day:'numeric', month:'long' })}</div>
+      </div>
+      <button class="delete-btn" style="color:var(--peach-dark)" onclick="deleteCalEvent(${data.calEvents.indexOf(e)})">×</button>
+    </div>`).join('');
+}
+function deleteCalEvent(i) { data.calEvents.splice(i, 1); save(); renderCalendar(); }
+
+function addReminder() {
+  const text = document.getElementById('reminderText').value.trim();
+  const time = document.getElementById('reminderTime').value;
+  const status = document.getElementById('notif-status');
+  if (!text || !time) { status.textContent = 'Remplis le texte et l\'heure.'; return; }
+  data.reminders.push({ text, time, id: Date.now() });
+  document.getElementById('reminderText').value = '';
+  document.getElementById('reminderTime').value = '';
+  save(); renderReminders();
+  if ('Notification' in window) {
+    Notification.requestPermission().then(p => {
+      if (p === 'granted') {
+        const [h, m] = time.split(':').map(Number);
+        const target = new Date(); target.setHours(h, m, 0, 0);
+        const diff = target - Date.now();
+        if (diff > 0) {
+          setTimeout(() => new Notification('Rappel 🌸', { body: text }), diff);
+          status.textContent = 'Rappel programmé à ' + time;
+        } else {
+          status.textContent = 'Cette heure est déjà passée — il sonnera demain à la même heure.';
+          const diff2 = diff + 86400000;
+          setTimeout(() => new Notification('Rappel 🌸', { body: text }), diff2);
+        }
+      } else {
+        status.textContent = 'Autorise les notifications dans les réglages Safari pour que ça fonctionne.';
+      }
+    });
+  } else {
+    status.textContent = 'Les notifications ne sont pas supportées sur cet appareil.';
+  }
+}
+function renderReminders() {
+  const el = document.getElementById('reminders-list');
+  if (!data.reminders.length) {
+    el.innerHTML = '<div class="empty-state">Aucun rappel programmé.</div>';
+    return;
+  }
+  el.innerHTML = data.reminders.map((r, i) => `
+    <div class="reminder-item">
+      <div>
+        <div class="reminder-text">${r.text}</div>
+        <div class="reminder-time">${r.time}</div>
+      </div>
+      <button class="delete-btn" style="color:var(--warm-dark)" onclick="deleteReminder(${i})">×</button>
+    </div>`).join('');
+}
+function deleteReminder(i) { data.reminders.splice(i, 1); save(); renderReminders(); }
+
+renderTasks('today');
+</script>
+
+
+</body></html>
