@@ -48,9 +48,7 @@ textarea { resize: none; line-height: 1.6; }
 .btn { padding: 10px 16px; border-radius: var(--radius-sm); border: none; font-size: 13px; font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer; transition: opacity 0.15s; }
 .btn:active { opacity: 0.7; }
 .btn-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.task-card { border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; transition: transform 0.2s; }
-.task-card.celebrate { animation: popcard 0.4s ease; }
-@keyframes popcard { 0%{transform:scale(1)} 50%{transform:scale(1.03)} 100%{transform:scale(1)} }
+.task-card { border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; }
 .task-header { display: flex; align-items: flex-start; justify-content: space-between; }
 .task-left { display: flex; align-items: flex-start; gap: 10px; flex: 1; }
 .task-name { font-size: 15px; font-weight: 500; line-height: 1.3; }
@@ -97,23 +95,35 @@ textarea { resize: none; line-height: 1.6; }
 .contact-detail { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 .contact-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; text-decoration: none; }
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-
-/* CONFETTIS */
 .confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; overflow: hidden; }
-.confetto { position: absolute; width: 10px; height: 10px; border-radius: 50%; animation: fall linear forwards; }
-@keyframes fall {
-  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-}
-
-/* TOAST */
+.confetto { position: absolute; animation: fall linear forwards; }
+@keyframes fall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
 .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #2C2C2A; color: white; padding: 10px 20px; border-radius: 20px; font-size: 13px; z-index: 999; white-space: nowrap; animation: fadeInOut 2.5s forwards; }
 @keyframes fadeInOut { 0%{opacity:0;transform:translateX(-50%) translateY(10px)} 15%{opacity:1;transform:translateX(-50%) translateY(0)} 75%{opacity:1} 100%{opacity:0} }
-
-/* WINS COUNTER */
 .wins-counter { display: flex; align-items: center; gap: 8px; background: var(--mint-light); border-radius: var(--radius-sm); padding: 8px 14px; margin-bottom: 12px; }
 .wins-number { font-size: 24px; font-weight: 500; color: var(--mint-dark); }
 .wins-label { font-size: 13px; color: var(--mint-dark); }
+
+/* POMODORO */
+.pomodoro-container { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 10px 0; }
+.pomodoro-mode-btns { display: flex; gap: 8px; }
+.mode-btn { padding: 7px 16px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; }
+.mode-btn.active { background: var(--rose-light); color: var(--rose-dark); border-color: var(--rose-dark)44; font-weight: 500; }
+.pomodoro-circle-wrap { position: relative; width: 220px; height: 220px; }
+.pomodoro-svg { transform: rotate(-90deg); }
+.pomodoro-bg { fill: none; stroke: var(--rose-light); stroke-width: 12; }
+.pomodoro-progress { fill: none; stroke: var(--rose-mid); stroke-width: 12; stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+.pomodoro-time { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+.pomodoro-time-text { font-size: 42px; font-weight: 500; color: var(--text); font-family: 'DM Serif Display', serif; line-height: 1; }
+.pomodoro-time-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+.pomodoro-btns { display: flex; gap: 12px; }
+.pomo-btn { padding: 12px 28px; border-radius: var(--radius-sm); border: none; font-size: 15px; font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer; }
+.pomo-start { background: var(--rose-mid); color: white; }
+.pomo-reset { background: var(--rose-light); color: var(--rose-dark); }
+.pomodoro-count { font-size: 13px; color: var(--text-muted); text-align: center; }
+.pomodoro-dots { display: flex; gap: 6px; justify-content: center; margin-top: 4px; }
+.pomo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); }
+.pomo-dot.done { background: var(--rose-mid); }
 </style>
 </head>
 <body>
@@ -131,6 +141,7 @@ textarea { resize: none; line-height: 1.6; }
     <button class="tab active" id="tab-today" onclick="showTab('today')">Aujourd'hui</button>
     <button class="tab" id="tab-tomorrow" onclick="showTab('tomorrow')">Demain</button>
     <button class="tab" id="tab-wins" onclick="showTab('wins')">Victoires</button>
+    <button class="tab" id="tab-pomodoro" onclick="showTab('pomodoro')">⏱ Focus</button>
     <button class="tab" id="tab-calendar" onclick="showTab('calendar')">Calendrier</button>
     <button class="tab" id="tab-reminders" onclick="showTab('reminders')">Rappels</button>
     <button class="tab" id="tab-notes" onclick="showTab('notes')">Notes</button>
@@ -184,6 +195,43 @@ textarea { resize: none; line-height: 1.6; }
       </div>
       <div id="wins-counter-box"></div>
       <div id="wins-list"></div>
+    </div>
+
+    <!-- POMODORO -->
+    <div class="panel" id="panel-pomodoro">
+      <div class="card">
+        <div class="pomodoro-container">
+          <div class="pomodoro-mode-btns">
+            <button class="mode-btn active" id="mode-work" onclick="setMode('work')">Travail 25 min</button>
+            <button class="mode-btn" id="mode-short" onclick="setMode('short')">Pause 5 min</button>
+            <button class="mode-btn" id="mode-long" onclick="setMode('long')">Grande pause 15 min</button>
+          </div>
+          <div class="pomodoro-circle-wrap">
+            <svg class="pomodoro-svg" width="220" height="220" viewBox="0 0 220 220">
+              <circle class="pomodoro-bg" cx="110" cy="110" r="96"/>
+              <circle class="pomodoro-progress" id="pomoCircle" cx="110" cy="110" r="96"/>
+            </svg>
+            <div class="pomodoro-time">
+              <div class="pomodoro-time-text" id="pomoTime">25:00</div>
+              <div class="pomodoro-time-label" id="pomoLabel">Prête à te concentrer ?</div>
+            </div>
+          </div>
+          <div class="pomodoro-btns">
+            <button class="pomo-btn pomo-start" id="pomoStartBtn" onclick="togglePomo()">Démarrer</button>
+            <button class="pomo-btn pomo-reset" onclick="resetPomo()">Reset</button>
+          </div>
+          <div class="pomodoro-count">
+            <div style="font-size:13px;color:var(--text-muted);">Sessions complétées</div>
+            <div class="pomodoro-dots" id="pomoDots"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="background:var(--rose-light);border-color:var(--rose-mid)33;">
+        <div style="font-size:13px;color:var(--rose-dark);line-height:1.7;">
+          <strong>Comment ça marche ?</strong><br>
+          Travaille 25 min sans interruption, puis fais une pause de 5 min. Après 4 sessions, offre-toi une grande pause de 15 min ! 🍅
+        </div>
+      </div>
     </div>
 
     <div class="panel" id="panel-calendar">
@@ -259,13 +307,13 @@ const colorMap = {
   lav:   { bg: '#EEEDFE', dark: '#3C3489', border: '#AFA9EC33' },
   warm:  { bg: '#FAEEDA', dark: '#633806', border: '#EF9F2733' }
 };
-const tabColors = { today:'rose', tomorrow:'lav', wins:'mint', calendar:'peach', reminders:'warm', notes:'blue', contacts:'lav' };
+const tabColors = { today:'rose', tomorrow:'lav', wins:'mint', pomodoro:'rose', calendar:'peach', reminders:'warm', notes:'blue', contacts:'lav' };
 const tabColorMap = { rose:['#FBEAF0','#72243E'], lav:['#EEEDFE','#3C3489'], mint:['#E1F5EE','#085041'], peach:['#FAECE7','#712B13'], warm:['#FAEEDA','#633806'], blue:['#E6F1FB','#0C447C'] };
 const confettiColors = ['#ED93B1','#5DCAA5','#AFA9EC','#F0997B','#EF9F27','#72243E','#085041'];
 
-const KEY = 'phany_app_v4';
+const KEY = 'phany_app_v5';
 let data = { today:[], tomorrow:[], wins:[], calEvents:[], reminders:[], notes:[], contacts:[] };
-let slotIndex = 1;
+let slotIdx = 1;
 
 function load() { try { const s = localStorage.getItem(KEY); if (s) { const d = JSON.parse(s); data = {...data, ...d}; } } catch(e) {} }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e) {} }
@@ -275,30 +323,158 @@ const now = new Date();
 let calYear = now.getFullYear(), calMonth_ = now.getMonth();
 const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 document.getElementById('dateDisplay').textContent = now.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
-
 const todayStr = now.toISOString().split('T')[0];
 document.getElementById('reminderDate1').value = todayStr;
 document.getElementById('calEventDate').value = todayStr;
 
-// CONFETTIS 🎉
+// POMODORO
+const MODES = { work: 25*60, short: 5*60, long: 15*60 };
+const LABELS = { work: 'Au travail Phany ! 💪', short: 'Petite pause méritée !', long: 'Grande pause — repose-toi !' };
+let pomoMode = 'work';
+let pomoTotal = MODES.work;
+let pomoLeft = MODES.work;
+let pomoRunning = false;
+let pomoTimer = null;
+let pomoSessions = 0;
+const circumference = 2 * Math.PI * 96;
+
+function initCircle() {
+  const circle = document.getElementById('pomoCircle');
+  circle.style.strokeDasharray = circumference;
+  circle.style.strokeDashoffset = 0;
+}
+
+function updateCircle() {
+  const circle = document.getElementById('pomoCircle');
+  const progress = pomoLeft / pomoTotal;
+  circle.style.strokeDashoffset = circumference * (1 - progress);
+}
+
+function updateTimeDisplay() {
+  const m = Math.floor(pomoLeft / 60).toString().padStart(2,'0');
+  const s = (pomoLeft % 60).toString().padStart(2,'0');
+  document.getElementById('pomoTime').textContent = m + ':' + s;
+}
+
+function updateDots() {
+  const dots = document.getElementById('pomoDots');
+  dots.innerHTML = '';
+  for(let i=0;i<4;i++) {
+    const d = document.createElement('div');
+    d.className = 'pomo-dot' + (i < pomoSessions % 4 ? ' done' : '');
+    dots.appendChild(d);
+  }
+}
+
+function setMode(mode) {
+  if(pomoRunning) return;
+  pomoMode = mode;
+  pomoTotal = MODES[mode];
+  pomoLeft = MODES[mode];
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('mode-'+mode).classList.add('active');
+  const circle = document.getElementById('pomoCircle');
+  circle.style.stroke = mode === 'work' ? '#ED93B1' : mode === 'short' ? '#5DCAA5' : '#AFA9EC';
+  document.getElementById('pomoLabel').textContent = 'Prête à commencer ?';
+  updateTimeDisplay();
+  updateCircle();
+}
+
+function togglePomo() {
+  if(pomoRunning) {
+    clearInterval(pomoTimer);
+    pomoRunning = false;
+    document.getElementById('pomoStartBtn').textContent = 'Reprendre';
+    document.getElementById('pomoLabel').textContent = 'En pause...';
+  } else {
+    pomoRunning = true;
+    document.getElementById('pomoStartBtn').textContent = 'Pause';
+    document.getElementById('pomoLabel').textContent = LABELS[pomoMode];
+    pomoTimer = setInterval(() => {
+      pomoLeft--;
+      updateTimeDisplay();
+      updateCircle();
+      if(pomoLeft <= 0) {
+        clearInterval(pomoTimer);
+        pomoRunning = false;
+        pomoFinished();
+      }
+    }, 1000);
+  }
+}
+
+function pomoFinished() {
+  if(pomoMode === 'work') {
+    pomoSessions++;
+    updateDots();
+    launchConfetti();
+    showToast('🎉 Session terminée ! Bravo Phany !');
+    playBeep();
+    document.getElementById('pomoStartBtn').textContent = 'Démarrer';
+    document.getElementById('pomoLabel').textContent = 'Session terminée ! Fais une pause 🌸';
+  } else {
+    showToast('⏱ Pause terminée ! Au travail !');
+    playBeep();
+    setMode('work');
+    document.getElementById('pomoStartBtn').textContent = 'Démarrer';
+  }
+}
+
+function resetPomo() {
+  clearInterval(pomoTimer);
+  pomoRunning = false;
+  pomoLeft = pomoTotal;
+  document.getElementById('pomoStartBtn').textContent = 'Démarrer';
+  document.getElementById('pomoLabel').textContent = 'Prête à te concentrer ?';
+  updateTimeDisplay();
+  updateCircle();
+}
+
+function playBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = 520;
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 1.5);
+  } catch(e) {}
+}
+
+initCircle();
+updateTimeDisplay();
+updateDots();
+
+// CONFETTIS
 function launchConfetti() {
   const container = document.createElement('div');
   container.className = 'confetti-container';
   document.body.appendChild(container);
-  for (let i = 0; i < 60; i++) {
+  for(let i=0;i<60;i++) {
     const c = document.createElement('div');
     c.className = 'confetto';
-    c.style.left = Math.random() * 100 + '%';
+    c.style.left = Math.random()*100+'%';
     c.style.top = '-10px';
-    c.style.background = confettiColors[Math.floor(Math.random() * confettiColors.length)];
-    c.style.width = (6 + Math.random() * 8) + 'px';
-    c.style.height = (6 + Math.random() * 8) + 'px';
-    c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-    c.style.animationDuration = (1.5 + Math.random() * 2) + 's';
-    c.style.animationDelay = (Math.random() * 0.5) + 's';
+    c.style.background = confettiColors[Math.floor(Math.random()*confettiColors.length)];
+    const size = 6+Math.random()*8;
+    c.style.width = size+'px'; c.style.height = size+'px';
+    c.style.borderRadius = Math.random()>0.5?'50%':'2px';
+    c.style.animationDuration = (1.5+Math.random()*2)+'s';
+    c.style.animationDelay = (Math.random()*0.5)+'s';
     container.appendChild(c);
   }
-  setTimeout(() => container.remove(), 3500);
+  setTimeout(()=>container.remove(), 3500);
+}
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 2500);
 }
 
 function showTab(tab) {
@@ -310,153 +486,124 @@ function showTab(tab) {
   const col = tabColors[tab];
   const [bg, dark] = tabColorMap[col];
   btn.style.background = bg; btn.style.color = dark; btn.style.borderColor = dark+'55';
-  if (tab==='calendar') renderCalendar();
-  if (tab==='wins') renderWins();
-  if (tab==='reminders') renderReminders();
-  if (tab==='today') renderTasks('today');
-  if (tab==='tomorrow') renderTasks('tomorrow');
-  if (tab==='notes') renderNotes();
-  if (tab==='contacts') renderContacts();
-}
-
-function showToast(msg) {
-  const t = document.createElement('div');
-  t.className = 'toast';
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 2500);
+  if(tab==='calendar') renderCalendar();
+  if(tab==='wins') renderWins();
+  if(tab==='reminders') renderReminders();
+  if(tab==='today') renderTasks('today');
+  if(tab==='tomorrow') renderTasks('tomorrow');
+  if(tab==='notes') renderNotes();
+  if(tab==='contacts') renderContacts();
 }
 
 function addTask(list) {
-  const nameId = list==='today' ? 'taskName' : 'tomorrowTask';
-  const stepsId = list==='today' ? 'taskSteps' : 'tomorrowSteps';
-  const colorId = list==='today' ? 'taskColor' : 'tomorrowColor';
+  const nameId = list==='today'?'taskName':'tomorrowTask';
+  const stepsId = list==='today'?'taskSteps':'tomorrowSteps';
+  const colorId = list==='today'?'taskColor':'tomorrowColor';
   const name = document.getElementById(nameId).value.trim();
-  if (!name) return;
+  if(!name) return;
   const steps = document.getElementById(stepsId).value.split('\n').filter(s=>s.trim()).map(s=>({text:s.trim(),done:false}));
   const color = document.getElementById(colorId).value;
-  data[list].push({ id:Date.now(), name, steps, done:false, color });
-  document.getElementById(nameId).value = '';
-  document.getElementById(stepsId).value = '';
+  data[list].push({id:Date.now(),name,steps,done:false,color});
+  document.getElementById(nameId).value='';
+  document.getElementById(stepsId).value='';
   save(); renderTasks(list);
 }
 
 function renderTasks(list) {
   const el = document.getElementById(list+'-tasks');
-  if (!data[list].length) { el.innerHTML='<div class="empty-state">Aucune tâche pour le moment.</div>'; return; }
-  el.innerHTML = data[list].map((task,i) => {
+  if(!data[list].length){el.innerHTML='<div class="empty-state">Aucune tâche pour le moment.</div>';return;}
+  el.innerHTML = data[list].map((task,i)=>{
     const c = colorMap[task.color]||colorMap.rose;
-    const stepsHtml = task.steps.length ? `<div class="steps">${task.steps.map((s,si)=>`
+    const stepsHtml = task.steps.length?`<div class="steps">${task.steps.map((s,si)=>`
       <div class="step-row">
         <input type="checkbox" class="check" ${s.done?'checked':''} onchange="toggleStep('${list}',${i},${si})" />
         <span class="step-text ${s.done?'done':''}">${s.text}</span>
-      </div>`).join('')}</div>` : '';
+      </div>`).join('')}</div>`:'';
     const moveBtn = list==='today'
-      ? `<button class="move-btn" onclick="moveToTomorrow(${i})">→ Demain</button>`
-      : `<button class="move-btn" onclick="moveToToday(${i})">→ Aujourd'hui</button>`;
-    return `<div class="task-card" id="taskcard-${list}-${i}" style="background:${c.bg};border:1px solid ${c.border};">
+      ?`<button class="move-btn" onclick="moveToTomorrow(${i})">→ Demain</button>`
+      :`<button class="move-btn" onclick="moveToToday(${i})">→ Aujourd'hui</button>`;
+    return `<div class="task-card" style="background:${c.bg};border:1px solid ${c.border};">
       <div class="task-header">
         <div class="task-left">
           <input type="checkbox" class="check" ${task.done?'checked':''} onchange="toggleTask('${list}',${i})" />
           <span class="task-name ${task.done?'done':''}" style="color:${c.dark}">${task.name}</span>
         </div>
-        <div class="task-actions">
-          ${moveBtn}
+        <div class="task-actions">${moveBtn}
           <button class="icon-btn" style="color:${c.dark}" onclick="deleteTask('${list}',${i})">×</button>
         </div>
-      </div>
-      ${stepsHtml}
+      </div>${stepsHtml}
     </div>`;
   }).join('');
 }
 
-function toggleTask(list, i) {
+function toggleTask(list,i) {
   data[list][i].done = !data[list][i].done;
-  if (data[list][i].done) {
-    data.wins.unshift({ text: data[list][i].name, date: now.toLocaleDateString('fr-FR'), auto: true });
-    launchConfetti();
-    showToast('🌟 Bravo Phany, tâche accomplie !');
+  if(data[list][i].done){
+    data.wins.unshift({text:data[list][i].name,date:now.toLocaleDateString('fr-FR'),auto:true});
+    launchConfetti(); showToast('🌟 Bravo Phany, tâche accomplie !');
   } else {
-    data.wins = data.wins.filter(w => !(w.auto && w.text === data[list][i].name));
+    data.wins = data.wins.filter(w=>!(w.auto&&w.text===data[list][i].name));
   }
   save(); renderTasks(list);
 }
-
 function toggleStep(list,ti,si) {
   data[list][ti].steps[si].done = !data[list][ti].steps[si].done;
-  if (data[list][ti].steps[si].done) {
-    launchConfetti();
-    showToast('✨ Étape accomplie !');
-  }
+  if(data[list][ti].steps[si].done){launchConfetti();showToast('✨ Étape accomplie !');}
   save(); renderTasks(list);
 }
+function deleteTask(list,i){data[list].splice(i,1);save();renderTasks(list);}
+function moveToTomorrow(i){const t=data.today.splice(i,1)[0];t.done=false;data.tomorrow.push(t);save();renderTasks('today');showToast('Tâche reportée à demain 👍');}
+function moveToToday(i){const t=data.tomorrow.splice(i,1)[0];t.done=false;data.today.push(t);save();renderTasks('tomorrow');showToast('Tâche avancée à aujourd\'hui 👍');}
 
-function deleteTask(list,i) { data[list].splice(i,1); save(); renderTasks(list); }
-
-function moveToTomorrow(i) {
-  const task = data.today.splice(i,1)[0]; task.done = false;
-  data.tomorrow.push(task); save(); renderTasks('today');
-  showToast('Tâche reportée à demain 👍');
+function addWin(){
+  const el=document.getElementById('winText');
+  const text=el.value.trim();
+  if(!text) return;
+  data.wins.unshift({text,date:now.toLocaleDateString('fr-FR'),auto:false});
+  el.value='';save();renderWins();launchConfetti();
 }
-function moveToToday(i) {
-  const task = data.tomorrow.splice(i,1)[0]; task.done = false;
-  data.today.push(task); save(); renderTasks('tomorrow');
-  showToast('Tâche avancée à aujourd\'hui 👍');
-}
-
-function addWin() {
-  const el = document.getElementById('winText');
-  const text = el.value.trim();
-  if (!text) return;
-  data.wins.unshift({ text, date: now.toLocaleDateString('fr-FR'), auto: false });
-  el.value=''; save(); renderWins();
-  launchConfetti();
-}
-
-function renderWins() {
-  const counter = document.getElementById('wins-counter-box');
-  const el = document.getElementById('wins-list');
-  counter.innerHTML = data.wins.length ? `<div class="wins-counter"><div class="wins-number">🌟 ${data.wins.length}</div><div class="wins-label">victoire${data.wins.length > 1 ? 's' : ''} au total !</div></div>` : '';
-  if (!data.wins.length) { el.innerHTML='<div class="empty-state">Tes victoires apparaîtront ici.<br>Chaque chose accomplie compte !</div>'; return; }
-  el.innerHTML = data.wins.map((w,i)=>`
+function renderWins(){
+  const counter=document.getElementById('wins-counter-box');
+  const el=document.getElementById('wins-list');
+  counter.innerHTML=data.wins.length?`<div class="wins-counter"><div class="wins-number">🌟 ${data.wins.length}</div><div class="wins-label">victoire${data.wins.length>1?'s':''} au total !</div></div>`:'';
+  if(!data.wins.length){el.innerHTML='<div class="empty-state">Tes victoires apparaîtront ici.<br>Chaque chose accomplie compte !</div>';return;}
+  el.innerHTML=data.wins.map((w,i)=>`
     <div class="win-card">
-      <div style="flex:1;">
-        <div class="win-text">🌟 ${w.text}</div>
-        ${w.auto ? '<span class="auto-badge">Tâche complétée</span>' : ''}
-        <div class="win-date">${w.date}</div>
-      </div>
+      <div style="flex:1;"><div class="win-text">🌟 ${w.text}</div>
+      ${w.auto?'<span class="auto-badge">Tâche complétée</span>':''}
+      <div class="win-date">${w.date}</div></div>
       <button class="icon-btn" style="color:var(--mint-dark)" onclick="deleteWin(${i})">×</button>
     </div>`).join('');
 }
-function deleteWin(i) { data.wins.splice(i,1); save(); renderWins(); }
+function deleteWin(i){data.wins.splice(i,1);save();renderWins();}
 
-function renderCalendar() {
-  document.getElementById('calMonth').textContent = months[calMonth_]+' '+calYear;
-  const grid = document.getElementById('calGrid');
-  const first = new Date(calYear, calMonth_, 1);
-  let startDay = first.getDay(); startDay = startDay===0?6:startDay-1;
-  const daysInMonth = new Date(calYear, calMonth_+1, 0).getDate();
+function renderCalendar(){
+  document.getElementById('calMonth').textContent=months[calMonth_]+' '+calYear;
+  const grid=document.getElementById('calGrid');
+  const first=new Date(calYear,calMonth_,1);
+  let startDay=first.getDay();startDay=startDay===0?6:startDay-1;
+  const daysInMonth=new Date(calYear,calMonth_+1,0).getDate();
   let html='';
   for(let i=0;i<startDay;i++) html+='<div></div>';
-  for(let d=1;d<=daysInMonth;d++) {
-    const ds = calYear+'-'+String(calMonth_+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-    const isToday = ds===todayStr;
-    const hasEvent = data.calEvents.some(e=>e.date===ds);
+  for(let d=1;d<=daysInMonth;d++){
+    const ds=calYear+'-'+String(calMonth_+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const isToday=ds===todayStr;
+    const hasEvent=data.calEvents.some(e=>e.date===ds);
     html+=`<div class="cal-cell ${isToday?'today':''} ${hasEvent?'has-event':''}" onclick="selectDate('${ds}')">${d}</div>`;
   }
-  grid.innerHTML=html; renderCalEvents();
+  grid.innerHTML=html;renderCalEvents();
 }
-function changeMonth(dir) { calMonth_+=dir; if(calMonth_<0){calMonth_=11;calYear--;} if(calMonth_>11){calMonth_=0;calYear++;} renderCalendar(); }
-function selectDate(date) { document.getElementById('calEventDate').value=date; }
-function addCalEvent() {
+function changeMonth(dir){calMonth_+=dir;if(calMonth_<0){calMonth_=11;calYear--;}if(calMonth_>11){calMonth_=0;calYear++;}renderCalendar();}
+function selectDate(date){document.getElementById('calEventDate').value=date;}
+function addCalEvent(){
   const date=document.getElementById('calEventDate').value;
   const text=document.getElementById('calEventText').value.trim();
   if(!date||!text) return;
   data.calEvents.push({date,text});
   document.getElementById('calEventText').value='';
-  save(); renderCalendar();
+  save();renderCalendar();
 }
-function renderCalEvents() {
+function renderCalEvents(){
   const el=document.getElementById('cal-events-list');
   if(!data.calEvents.length){el.innerHTML='';return;}
   const sorted=[...data.calEvents].sort((a,b)=>a.date.localeCompare(b.date));
@@ -467,47 +614,46 @@ function renderCalEvents() {
       <button class="icon-btn" style="color:var(--peach-dark)" onclick="deleteCalEvent(${data.calEvents.indexOf(e)})">×</button>
     </div>`).join('');
 }
-function deleteCalEvent(i) { data.calEvents.splice(i,1); save(); renderCalendar(); }
+function deleteCalEvent(i){data.calEvents.splice(i,1);save();renderCalendar();}
 
-let slotIdx = 1;
-function addSlot() {
+function addSlot(){
   slotIdx++;
-  const div = document.createElement('div');
-  div.className = 'two-col'; div.style.marginBottom = '8px';
-  div.innerHTML = `<input type="date" id="reminderDate${slotIdx}" value="${todayStr}" /><input type="time" id="reminderTime${slotIdx}" />`;
+  const div=document.createElement('div');
+  div.className='two-col';div.style.marginBottom='8px';
+  div.innerHTML=`<input type="date" id="reminderDate${slotIdx}" value="${todayStr}" /><input type="time" id="reminderTime${slotIdx}" />`;
   document.getElementById('extra-slots').appendChild(div);
 }
-function addReminder() {
-  const text = document.getElementById('reminderText').value.trim();
-  if (!text) return;
-  const slots = [];
-  for(let i=1;i<=slotIdx;i++) {
-    const d = document.getElementById('reminderDate'+i);
-    const t = document.getElementById('reminderTime'+i);
-    if(d&&t&&d.value&&t.value) slots.push({date:d.value, time:t.value});
+function addReminder(){
+  const text=document.getElementById('reminderText').value.trim();
+  if(!text) return;
+  const slots=[];
+  for(let i=1;i<=slotIdx;i++){
+    const d=document.getElementById('reminderDate'+i);
+    const t=document.getElementById('reminderTime'+i);
+    if(d&&t&&d.value&&t.value) slots.push({date:d.value,time:t.value});
   }
-  if(!slots.length) { document.getElementById('notif-status').textContent='Ajoute au moins une date et heure.'; return; }
-  data.reminders.push({ id:Date.now(), text, slots });
+  if(!slots.length){document.getElementById('notif-status').textContent='Ajoute au moins une date et heure.';return;}
+  data.reminders.push({id:Date.now(),text,slots});
   document.getElementById('reminderText').value='';
   document.getElementById('reminderDate1').value=todayStr;
   document.getElementById('reminderTime1').value='';
   document.getElementById('extra-slots').innerHTML='';
   slotIdx=1;
-  save(); renderReminders();
-  slots.forEach(s => scheduleOne(text, s.date, s.time));
+  save();renderReminders();
+  slots.forEach(s=>scheduleOne(text,s.date,s.time));
 }
-function scheduleOne(text, date, time) {
+function scheduleOne(text,date,time){
   if(!('Notification' in window)) return;
-  Notification.requestPermission().then(p => {
-    if(p==='granted') {
-      const target = new Date(date+'T'+time+':00');
-      const diff = target - Date.now();
-      if(diff>0) setTimeout(()=>new Notification('Rappel 🌸',{body:text}), diff);
-      document.getElementById('notif-status').textContent = 'Rappel programmé !';
+  Notification.requestPermission().then(p=>{
+    if(p==='granted'){
+      const target=new Date(date+'T'+time+':00');
+      const diff=target-Date.now();
+      if(diff>0) setTimeout(()=>new Notification('Rappel 🌸',{body:text}),diff);
+      document.getElementById('notif-status').textContent='Rappel programmé !';
     }
   });
 }
-function renderReminders() {
+function renderReminders(){
   const el=document.getElementById('reminders-list');
   if(!data.reminders.length){el.innerHTML='<div class="empty-state">Aucun rappel programmé.</div>';return;}
   el.innerHTML=data.reminders.map((r,i)=>`
@@ -519,18 +665,18 @@ function renderReminders() {
       ${r.slots.map(s=>`<div class="reminder-slot"><span class="reminder-slot-text">${new Date(s.date+'T12:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'})} à ${s.time}</span></div>`).join('')}
     </div>`).join('');
 }
-function deleteReminder(i) { data.reminders.splice(i,1); save(); renderReminders(); }
+function deleteReminder(i){data.reminders.splice(i,1);save();renderReminders();}
 
-function addNote() {
-  const title = document.getElementById('noteTitle').value.trim();
-  const body = document.getElementById('noteBody').value.trim();
+function addNote(){
+  const title=document.getElementById('noteTitle').value.trim();
+  const body=document.getElementById('noteBody').value.trim();
   if(!title&&!body) return;
-  data.notes.unshift({ id:Date.now(), title, body, date:now.toLocaleDateString('fr-FR') });
+  data.notes.unshift({id:Date.now(),title,body,date:now.toLocaleDateString('fr-FR')});
   document.getElementById('noteTitle').value='';
   document.getElementById('noteBody').value='';
-  save(); renderNotes();
+  save();renderNotes();
 }
-function renderNotes() {
+function renderNotes(){
   const el=document.getElementById('notes-list');
   if(!data.notes.length){el.innerHTML='<div class="empty-state">Aucune note pour le moment.</div>';return;}
   el.innerHTML=data.notes.map((n,i)=>`
@@ -545,20 +691,20 @@ function renderNotes() {
       </div>
     </div>`).join('');
 }
-function deleteNote(i) { data.notes.splice(i,1); save(); renderNotes(); }
+function deleteNote(i){data.notes.splice(i,1);save();renderNotes();}
 
-function addContact() {
+function addContact(){
   const name=document.getElementById('contactName').value.trim();
   const phone=document.getElementById('contactPhone').value.trim();
   const note=document.getElementById('contactNote').value.trim();
   if(!name) return;
-  data.contacts.push({ id:Date.now(), name, phone, note });
+  data.contacts.push({id:Date.now(),name,phone,note});
   document.getElementById('contactName').value='';
   document.getElementById('contactPhone').value='';
   document.getElementById('contactNote').value='';
-  save(); renderContacts();
+  save();renderContacts();
 }
-function renderContacts() {
+function renderContacts(){
   const el=document.getElementById('contacts-list');
   if(!data.contacts.length){el.innerHTML='<div class="empty-state">Aucun contact enregistré.</div>';return;}
   const sorted=[...data.contacts].sort((a,b)=>a.name.localeCompare(b.name));
@@ -579,7 +725,7 @@ function renderContacts() {
     </div>`;
   }).join('');
 }
-function deleteContact(i) { data.contacts.splice(i,1); save(); renderContacts(); }
+function deleteContact(i){data.contacts.splice(i,1);save();renderContacts();}
 
 renderTasks('today');
 </script>
