@@ -347,14 +347,14 @@ textarea { resize: none; line-height: 1.6; }
         <input type="text" id="agendaText" placeholder="Description..." />
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Catégorie :</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="agendaCatPicker">
-          <button class="cat-btn" id="cat-anniv">🎂 Anniversaire</button>
-          <button class="cat-btn" id="cat-repas">🍽️ Repas</button>
-          <button class="cat-btn" id="cat-rdv">🏥 Rendez-vous</button>
-          <button class="cat-btn" id="cat-med">💊 Médical</button>
-          <button class="cat-btn" id="cat-fete">🎉 Fête</button>
-          <button class="cat-btn" id="cat-sport">🏃 Sport</button>
-          <button class="cat-btn" id="cat-voyage">✈️ Voyage</button>
-          <button class="cat-btn" id="cat-autre">📋 Autre</button>
+          <button class="cat-btn" id="cat-anniv" onclick="agendaSetCat(this,'🎂','#FBEAF0','#72243E')">🎂 Anniversaire</button>
+          <button class="cat-btn" id="cat-repas" onclick="agendaSetCat(this,'🍽️','#FAECE7','#712B13')">🍽️ Repas</button>
+          <button class="cat-btn" id="cat-rdv" onclick="agendaSetCat(this,'🏥','#EEEDFE','#3C3489')">🏥 Rendez-vous</button>
+          <button class="cat-btn" id="cat-med" onclick="agendaSetCat(this,'💊','#E1F5EE','#085041')">💊 Médical</button>
+          <button class="cat-btn" id="cat-fete" onclick="agendaSetCat(this,'🎉','#FAEEDA','#633806')">🎉 Fête</button>
+          <button class="cat-btn" id="cat-sport" onclick="agendaSetCat(this,'🏃','#EAF3DE','#27500A')">🏃 Sport</button>
+          <button class="cat-btn" id="cat-voyage" onclick="agendaSetCat(this,'✈️','#E6F1FB','#0C447C')">✈️ Voyage</button>
+          <button class="cat-btn" id="cat-autre" onclick="agendaSetCat(this,'📋','#F1EFE8','#2C2C2A')">📋 Autre</button>
         </div>
         <div class="two-col">
           <input type="date" id="agendaDate" />
@@ -368,9 +368,9 @@ textarea { resize: none; line-height: 1.6; }
           <option value="yearly">Chaque année</option>
         </select>
         <div id="agenda-extra-slots"></div>
-        <button class="add-slot-btn" id="agendaAddSlotBtn">+ Ajouter un autre horaire de rappel</button>
+        <button class="add-slot-btn" onclick="agendaAddSlot()">+ Ajouter un autre horaire de rappel</button>
         <div style="height:8px;"></div>
-        <button class="btn" id="agendaSubmitBtn" style="background:var(--peach-light);color:var(--peach-dark);width:100%;">Ajouter</button>
+        <button class="btn" id="agendaSubmitBtn" style="background:var(--peach-light);color:var(--peach-dark);width:100%;" onclick="agendaSubmit()">Ajouter</button>
         <div style="font-size:12px;color:var(--text-muted);margin-top:6px;" id="agenda-notif-status"></div>
       </div>
       <div id="agenda-events-list"></div>
@@ -1072,104 +1072,68 @@ function selectCat(el) {
 
 const recurLabels = { none:'', weekly:'Chaque semaine', monthly:'Chaque mois', yearly:'Chaque année' };
 
+function agendaSetCat(btn, emoji, color, dark) {
+  document.querySelectorAll('.cat-btn').forEach(b => {
+    b.style.background='transparent'; b.style.color='var(--text-muted)'; b.style.borderColor='var(--border)';
+  });
+  btn.style.background=color; btn.style.color=dark; btn.style.borderColor=dark+'66';
+  currentCat = { emoji, color, dark };
+}
+
+function agendaAddSlot() {
+  agendaSlotIdx++;
+  const div = document.createElement('div');
+  div.className = 'two-col'; div.style.marginBottom = '8px';
+  div.innerHTML = '<input type="date" id="agendaDate'+agendaSlotIdx+'" value="'+todayStr+'" /><input type="time" id="agendaTime'+agendaSlotIdx+'" />';
+  document.getElementById('agenda-extra-slots').appendChild(div);
+}
+
+function agendaSubmit() {
+  const text = document.getElementById('agendaText').value.trim();
+  const date = document.getElementById('agendaDate').value;
+  const recur = document.getElementById('agendaRecur').value;
+  const time1 = document.getElementById('agendaTime1').value;
+
+  if(!text){ showToast('Écris une description !'); return; }
+  if(!date){ showToast('Choisis une date !'); return; }
+
+  const slots = [];
+  if(time1) slots.push({date, time:time1});
+  for(let i=2; i<=agendaSlotIdx; i++){
+    const dEl = document.getElementById('agendaDate'+i);
+    const tEl = document.getElementById('agendaTime'+i);
+    if(dEl && tEl && tEl.value) slots.push({date: dEl.value||date, time: tEl.value});
+  }
+
+  const item = { date, text, cat: currentCat.emoji, color: currentCat.color, dark: currentCat.dark, recur };
+  if(slots.length > 0){
+    data.reminders.push({id: Date.now(), ...item, slots});
+    slots.forEach(s => scheduleOne(text, s.date, s.time));
+  } else {
+    data.calEvents.push({id: Date.now(), ...item});
+  }
+
+  document.getElementById('agendaText').value = '';
+  document.getElementById('agendaDate').value = todayStr;
+  document.getElementById('agendaTime1').value = '';
+  document.getElementById('agendaRecur').value = 'none';
+  document.getElementById('agenda-extra-slots').innerHTML = '';
+  agendaSlotIdx = 1;
+  currentCat = { emoji:'🎂', color:'#FBEAF0', dark:'#72243E' };
+  document.querySelectorAll('.cat-btn').forEach(b => { b.style.background='transparent'; b.style.color='var(--text-muted)'; b.style.borderColor='var(--border)'; });
+  const first = document.getElementById('cat-anniv');
+  if(first){ first.style.background='#FBEAF0'; first.style.color='#72243E'; first.style.borderColor='#72243E66'; }
+  save(); renderCalendar(); renderAgendaList();
+  showToast('Ajouté à l\'agenda ! 📅');
+}
+
 function renderAgenda() {
   agendaSlotIdx = 1;
   currentCat = { emoji:'🎂', color:'#FBEAF0', dark:'#72243E' };
-
-  // Init date
   const dateEl = document.getElementById('agendaDate');
-  if(dateEl && !dateEl.value) dateEl.value = todayStr;
-
-  // Init category buttons
-  const cats = [
-    {id:'cat-anniv', emoji:'🎂', color:'#FBEAF0', dark:'#72243E'},
-    {id:'cat-repas', emoji:'🍽️', color:'#FAECE7', dark:'#712B13'},
-    {id:'cat-rdv',   emoji:'🏥', color:'#EEEDFE', dark:'#3C3489'},
-    {id:'cat-med',   emoji:'💊', color:'#E1F5EE', dark:'#085041'},
-    {id:'cat-fete',  emoji:'🎉', color:'#FAEEDA', dark:'#633806'},
-    {id:'cat-sport', emoji:'🏃', color:'#EAF3DE', dark:'#27500A'},
-    {id:'cat-voyage',emoji:'✈️', color:'#E6F1FB', dark:'#0C447C'},
-    {id:'cat-autre', emoji:'📋', color:'#F1EFE8', dark:'#2C2C2A'},
-  ];
-
-  // Reset all cat buttons first
-  cats.forEach(c => {
-    const btn = document.getElementById(c.id);
-    if(!btn) return;
-    btn.style.background = 'transparent';
-    btn.style.color = 'var(--text-muted)';
-    btn.style.borderColor = 'var(--border)';
-    btn.onclick = null;
-    btn.addEventListener('click', function() {
-      cats.forEach(x => {
-        const b = document.getElementById(x.id);
-        if(b){ b.style.background='transparent'; b.style.color='var(--text-muted)'; b.style.borderColor='var(--border)'; }
-      });
-      btn.style.background = c.color;
-      btn.style.color = c.dark;
-      btn.style.borderColor = c.dark+'66';
-      currentCat = { emoji:c.emoji, color:c.color, dark:c.dark };
-    });
-  });
-
-  // Activate first cat
-  const firstBtn = document.getElementById('cat-anniv');
-  if(firstBtn){ firstBtn.style.background='#FBEAF0'; firstBtn.style.color='#72243E'; firstBtn.style.borderColor='#72243E66'; }
-
-  // Add slot button
-  const addSlotBtn = document.getElementById('agendaAddSlotBtn');
-  if(addSlotBtn){
-    addSlotBtn.onclick = function() {
-      agendaSlotIdx++;
-      const div = document.createElement('div');
-      div.className = 'two-col'; div.style.marginBottom = '8px';
-      div.innerHTML = '<input type="date" id="agendaDate'+agendaSlotIdx+'" value="'+todayStr+'" /><input type="time" id="agendaTime'+agendaSlotIdx+'" />';
-      document.getElementById('agenda-extra-slots').appendChild(div);
-    };
-  }
-
-  // Submit button
-  const submitBtn = document.getElementById('agendaSubmitBtn');
-  if(submitBtn){
-    submitBtn.onclick = function() {
-      const text = document.getElementById('agendaText').value.trim();
-      const date = document.getElementById('agendaDate').value;
-      const recur = document.getElementById('agendaRecur').value;
-      const time1 = document.getElementById('agendaTime1').value;
-
-      if(!text){ showToast('Écris une description !'); return; }
-      if(!date){ showToast('Choisis une date !'); return; }
-
-      const slots = [];
-      if(time1) slots.push({date, time:time1});
-      for(let i=2; i<=agendaSlotIdx; i++){
-        const dEl = document.getElementById('agendaDate'+i);
-        const tEl = document.getElementById('agendaTime'+i);
-        if(dEl && tEl && tEl.value) slots.push({date: dEl.value||date, time: tEl.value});
-      }
-
-      const item = { date, text, cat: currentCat.emoji, color: currentCat.color, dark: currentCat.dark, recur };
-
-      if(slots.length > 0){
-        data.reminders.push({id: Date.now(), ...item, slots});
-        slots.forEach(s => scheduleOne(text, s.date, s.time));
-      } else {
-        data.calEvents.push({id: Date.now(), ...item});
-      }
-
-      // Reset form
-      document.getElementById('agendaText').value = '';
-      document.getElementById('agendaDate').value = todayStr;
-      document.getElementById('agendaTime1').value = '';
-      document.getElementById('agendaRecur').value = 'none';
-      document.getElementById('agenda-extra-slots').innerHTML = '';
-      agendaSlotIdx = 1;
-
-      save(); renderCalendar(); renderAgendaList();
-      showToast('Ajouté à l\'agenda ! 📅');
-    };
-  }
-
+  if(dateEl) dateEl.value = todayStr;
+  const first = document.getElementById('cat-anniv');
+  if(first){ first.style.background='#FBEAF0'; first.style.color='#72243E'; first.style.borderColor='#72243E66'; }
   renderCalendar();
   renderAgendaList();
 }
