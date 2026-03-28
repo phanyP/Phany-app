@@ -114,6 +114,13 @@ textarea { resize: none; line-height: 1.6; }
 .week-task-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 .week-task-name { font-size: 14px; color: var(--text); flex: 1; }
 .week-event-item { background: var(--peach-light); border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 6px; font-size: 13px; color: var(--peach-dark); }
+
+/* PRIORITÉ */
+.priority-badge { font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 500; display: inline-block; margin-left: 6px; }
+.priority-urgent { background: #FCEBEB; color: #A32D2D; }
+.priority-important { background: #FAEEDA; color: #633806; }
+.priority-normal { background: #EAF3DE; color: #27500A; }
+.priority-select { -webkit-appearance: none; appearance: none; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); font-size: 12px; font-family: 'DM Sans', sans-serif; cursor: pointer; background: var(--bg); color: var(--text-muted); }
 .confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; overflow: hidden; }
 .confetto { position: absolute; animation: fall linear forwards; }
 @keyframes fall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
@@ -183,6 +190,11 @@ textarea { resize: none; line-height: 1.6; }
             <option value="lav">Lavande</option>
             <option value="warm">Doré</option>
           </select>
+          <select id="taskPriority" style="flex:1;">
+            <option value="normal">🟢 Normal</option>
+            <option value="important">🟡 Important</option>
+            <option value="urgent">🔴 Urgent</option>
+          </select>
           <button class="btn" style="background:var(--rose-light);color:var(--rose-dark);" onclick="addTask('today')">Ajouter</button>
         </div>
       </div>
@@ -201,6 +213,11 @@ textarea { resize: none; line-height: 1.6; }
             <option value="mint">Menthe</option>
             <option value="peach">Pêche</option>
             <option value="warm">Doré</option>
+          </select>
+          <select id="tomorrowPriority" style="flex:1;">
+            <option value="normal">🟢 Normal</option>
+            <option value="important">🟡 Important</option>
+            <option value="urgent">🔴 Urgent</option>
           </select>
           <button class="btn" style="background:var(--lav-light);color:var(--lav-dark);" onclick="addTask('tomorrow')">Ajouter</button>
         </div>
@@ -568,7 +585,8 @@ function addTask(list) {
   if(!name) return;
   const steps = document.getElementById(stepsId).value.split('\n').filter(s=>s.trim()).map(s=>({text:s.trim(),done:false}));
   const color = document.getElementById(colorId).value;
-  data[list].push({id:Date.now(),name,steps,done:false,color});
+  const priority = document.getElementById(list==='today'?'taskPriority':'tomorrowPriority').value;
+  data[list].push({id:Date.now(),name,steps,done:false,color,priority});
   document.getElementById(nameId).value='';
   document.getElementById(stepsId).value='';
   save(); renderTasks(list);
@@ -720,24 +738,28 @@ injectRecurringToday();
 function renderTasks(list) {
   const el = document.getElementById(list+'-tasks');
   if(!data[list].length){el.innerHTML='<div class="empty-state">Aucune tâche pour le moment.</div>';return;}
-  el.innerHTML = data[list].map((task,i)=>{
+  const priorityOrder = { urgent: 0, important: 1, normal: 2 };
+  const sorted = [...data[list]].sort((a,b) => (priorityOrder[a.priority||'normal']) - (priorityOrder[b.priority||'normal']));
+  el.innerHTML = sorted.map((task,i)=>{
     const c = colorMap[task.color]||colorMap.rose;
+    const priorityMap = { urgent: ['🔴 Urgent','priority-urgent'], important: ['🟡 Important','priority-important'], normal: ['🟢 Normal','priority-normal'] };
+    const [pLabel, pClass] = priorityMap[task.priority||'normal'];
     const stepsHtml = task.steps.length?`<div class="steps">${task.steps.map((s,si)=>`
       <div class="step-row">
-        <input type="checkbox" class="check" ${s.done?'checked':''} onchange="toggleStep('${list}',${i},${si})" />
+        <input type="checkbox" class="check" ${s.done?'checked':''} onchange="toggleStep('${list}',${data[list].indexOf(task)},${si})" />
         <span class="step-text ${s.done?'done':''}">${s.text}</span>
       </div>`).join('')}</div>`:'';
     const moveBtn = list==='today'
-      ?`<button class="move-btn" onclick="moveToTomorrow(${i})">→ Demain</button>`
-      :`<button class="move-btn" onclick="moveToToday(${i})">→ Aujourd'hui</button>`;
+      ?`<button class="move-btn" onclick="moveToTomorrow(${data[list].indexOf(task)})">→ Demain</button>`
+      :`<button class="move-btn" onclick="moveToToday(${data[list].indexOf(task)})">→ Aujourd'hui</button>`;
     return `<div class="task-card" style="background:${c.bg};border:1px solid ${c.border};">
       <div class="task-header">
         <div class="task-left">
-          <input type="checkbox" class="check" ${task.done?'checked':''} onchange="toggleTask('${list}',${i})" />
-          <span class="task-name ${task.done?'done':''}" style="color:${c.dark}">${task.name}</span>
+          <input type="checkbox" class="check" ${task.done?'checked':''} onchange="toggleTask('${list}',${data[list].indexOf(task)})" />
+          <span class="task-name ${task.done?'done':''}" style="color:${c.dark}">${task.name} <span class="priority-badge ${pClass}">${pLabel}</span></span>
         </div>
         <div class="task-actions">${moveBtn}
-          <button class="icon-btn" style="color:${c.dark}" onclick="deleteTask('${list}',${i})">×</button>
+          <button class="icon-btn" style="color:${c.dark}" onclick="deleteTask('${list}',${data[list].indexOf(task)})">×</button>
         </div>
       </div>${stepsHtml}
     </div>`;
