@@ -1,0 +1,18 @@
+{
+  "name": "Mon App Phany",
+  "short_name": "Mon App",
+  "description": "Mon application personnelle",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#E8C8D8",
+  "theme_color": "#E8C8D8",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
