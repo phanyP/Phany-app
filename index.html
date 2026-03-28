@@ -83,6 +83,10 @@ textarea { resize: none; line-height: 1.6; }
 .reminder-title { font-size: 14px; font-weight: 500; color: var(--warm-dark); flex: 1; }
 .reminder-slot { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.5); border-radius: 8px; padding: 6px 10px; margin-top: 4px; }
 .reminder-slot-text { font-size: 12px; color: var(--warm-dark); }
+
+/* CATÉGORIES AGENDA */
+.cat-btn { padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-size: 12px; font-family: 'DM Sans', sans-serif; cursor: pointer; white-space: nowrap; }
+.cat-btn.active { font-weight: 500; border-width: 1.5px; }
 .add-slot-btn { font-size: 12px; color: var(--warm-dark); background: rgba(255,255,255,0.6); border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; padding: 5px 10px; cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 6px; width: 100%; }
 .section-label { font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 16px 0 8px; }
 .note-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; }
@@ -341,10 +345,32 @@ textarea { resize: none; line-height: 1.6; }
       <div class="card">
         <div class="card-title">Ajouter un événement ou rappel</div>
         <input type="text" id="agendaText" placeholder="Description..." />
+
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Catégorie :</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="agendaCatPicker">
+          <button class="cat-btn active" data-cat="🎂" data-color="#FBEAF0" data-dark="#72243E" onclick="selectCat(this)">🎂 Anniversaire</button>
+          <button class="cat-btn" data-cat="🍽️" data-color="#FAECE7" data-dark="#712B13" onclick="selectCat(this)">🍽️ Repas</button>
+          <button class="cat-btn" data-cat="🏥" data-color="#EEEDFE" data-dark="#3C3489" onclick="selectCat(this)">🏥 Rendez-vous</button>
+          <button class="cat-btn" data-cat="💊" data-color="#E1F5EE" data-dark="#085041" onclick="selectCat(this)">💊 Médical</button>
+          <button class="cat-btn" data-cat="🎉" data-color="#FAEEDA" data-dark="#633806" onclick="selectCat(this)">🎉 Fête</button>
+          <button class="cat-btn" data-cat="🏃" data-color="#EAF3DE" data-dark="#27500A" onclick="selectCat(this)">🏃 Sport</button>
+          <button class="cat-btn" data-cat="✈️" data-color="#E6F1FB" data-dark="#0C447C" onclick="selectCat(this)">✈️ Voyage</button>
+          <button class="cat-btn" data-cat="📋" data-color="#F1EFE8" data-dark="#2C2C2A" onclick="selectCat(this)">📋 Autre</button>
+        </div>
+
         <div class="two-col">
           <input type="date" id="agendaDate" />
           <input type="time" id="agendaTime1" placeholder="Heure (optionnel)" />
         </div>
+
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Répétition :</div>
+        <select id="agendaRecur" style="margin-bottom:10px;">
+          <option value="none">Une seule fois</option>
+          <option value="weekly">Chaque semaine</option>
+          <option value="monthly">Chaque mois</option>
+          <option value="yearly">Chaque année</option>
+        </select>
+
         <div id="agenda-extra-slots"></div>
         <button class="add-slot-btn" onclick="addAgendaSlot()">+ Ajouter un autre horaire de rappel</button>
         <div style="height:8px;"></div>
@@ -1032,6 +1058,23 @@ function deleteWin(i){data.wins.splice(i,1);save();renderWins();}
 
 // AGENDA UNIFIÉ
 let agendaSlotIdx = 1;
+let currentCat = { emoji:'🎂', color:'#FBEAF0', dark:'#72243E' };
+
+function selectCat(el) {
+  document.querySelectorAll('.cat-btn').forEach(b => {
+    b.classList.remove('active');
+    b.style.background = 'transparent';
+    b.style.color = 'var(--text-muted)';
+    b.style.borderColor = 'var(--border)';
+  });
+  el.classList.add('active');
+  el.style.background = el.dataset.color;
+  el.style.color = el.dataset.dark;
+  el.style.borderColor = el.dataset.dark + '66';
+  currentCat = { emoji: el.dataset.cat, color: el.dataset.color, dark: el.dataset.dark };
+}
+
+const recurLabels = { none:'', weekly:'Chaque semaine', monthly:'Chaque mois', yearly:'Chaque année' };
 
 function renderAgenda() {
   document.getElementById('agendaDate').value = todayStr;
@@ -1074,27 +1117,31 @@ function addAgendaSlot(){
 function addAgendaItem(){
   const text=document.getElementById('agendaText').value.trim();
   const date=document.getElementById('agendaDate').value;
-  if(!text||!date) return;
+  const recur=document.getElementById('agendaRecur').value;
+  if(!text||!date){ showToast('Remplis la description et la date !'); return; }
 
   const slots=[];
-  for(let i=1;i<=agendaSlotIdx;i++){
-    const dateEl=document.getElementById('agendaDate'+(i===1?'':i));
+  const time1=document.getElementById('agendaTime1').value;
+  if(time1) slots.push({date,time:time1});
+  for(let i=2;i<=agendaSlotIdx;i++){
+    const dateEl=document.getElementById('agendaDate'+i);
     const timeEl=document.getElementById('agendaTime'+i);
-    const d=i===1?date:(dateEl?dateEl.value:date);
-    const t=timeEl?timeEl.value:'';
-    if(t) slots.push({date:d,time:t});
+    if(dateEl&&timeEl&&timeEl.value) slots.push({date:dateEl.value||date,time:timeEl.value});
   }
 
+  const item = { date, text, cat: currentCat.emoji, color: currentCat.color, dark: currentCat.dark, recur };
+
   if(slots.length>0){
-    data.reminders.push({id:Date.now(),text,slots});
+    data.reminders.push({id:Date.now(), ...item, slots});
     slots.forEach(s=>scheduleOne(text,s.date,s.time));
   } else {
-    data.calEvents.push({date,text});
+    data.calEvents.push({id:Date.now(), ...item});
   }
 
   document.getElementById('agendaText').value='';
   document.getElementById('agendaDate').value=todayStr;
   document.getElementById('agendaTime1').value='';
+  document.getElementById('agendaRecur').value='none';
   document.getElementById('agenda-extra-slots').innerHTML='';
   agendaSlotIdx=1;
   save();renderCalendar();renderAgendaList();
@@ -1115,31 +1162,28 @@ function scheduleOne(text,date,time){
 
 function renderAgendaList(){
   const el=document.getElementById('agenda-events-list');
-  let html='';
+  let allItems=[];
 
-  const allItems=[];
-  data.calEvents.forEach((e,i)=>allItems.push({type:'event',date:e.date,text:e.text,idx:i}));
+  data.calEvents.forEach((e,i)=>allItems.push({type:'event', date:e.date, text:e.text, cat:e.cat||'📅', color:e.color||'#FAECE7', dark:e.dark||'#712B13', recur:e.recur||'none', idx:i}));
   data.reminders.forEach((r,i)=>{
     if(r.slots&&r.slots.length){
-      r.slots.forEach(s=>allItems.push({type:'reminder',date:s.date,time:s.time,text:r.text,idx:i}));
+      r.slots.forEach(s=>allItems.push({type:'reminder', date:s.date, time:s.time, text:r.text, cat:r.cat||'🔔', color:r.color||'#FAEEDA', dark:r.dark||'#633806', recur:r.recur||'none', idx:i}));
     }
   });
   allItems.sort((a,b)=>a.date.localeCompare(b.date)||(a.time||'').localeCompare(b.time||''));
 
   if(!allItems.length){el.innerHTML='<div class="empty-state">Aucun événement ou rappel 📅</div>';return;}
 
-  html='<div class="section-label">Tous les événements et rappels</div>';
+  let html='<div class="section-label">Tous les événements et rappels</div>';
   allItems.forEach(item=>{
-    const dateLabel=new Date(item.date+'T12:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'long'});
-    const isReminder=item.type==='reminder';
-    html+=`<div class="${isReminder?'reminder-card':'event-item'}" style="margin-bottom:8px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-        <div>
-          <div style="font-size:14px;color:${isReminder?'var(--warm-dark)':'var(--peach-dark)'};">${isReminder?'🔔':'📅'} ${item.text}</div>
-          <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${dateLabel}${item.time?' à '+item.time:''}</div>
-        </div>
-        <button class="icon-btn" onclick="${isReminder?'deleteReminder('+item.idx+')':'deleteCalEvent('+item.idx+')'}" style="color:${isReminder?'var(--warm-dark)':'var(--peach-dark)'};">×</button>
+    const dateLabel=new Date(item.date+'T12:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'long',year:'numeric'});
+    const recurLabel=item.recur&&item.recur!=='none'?` · ${recurLabels[item.recur]}`:'';
+    html+=`<div style="background:${item.color};border:1px solid ${item.dark}33;border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <div style="font-size:14px;font-weight:500;color:${item.dark};">${item.cat} ${item.text}</div>
+        <div style="font-size:12px;color:${item.dark};opacity:0.7;margin-top:2px;">${dateLabel}${item.time?' à '+item.time:''}${recurLabel}</div>
       </div>
+      <button class="icon-btn" onclick="${item.type==='reminder'?'deleteReminder('+item.idx+')':'deleteCalEvent('+item.idx+')'}" style="color:${item.dark};">×</button>
     </div>`;
   });
   el.innerHTML=html;
