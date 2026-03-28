@@ -95,6 +95,8 @@ textarea { resize: none; line-height: 1.6; }
 .contact-detail { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 .contact-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; text-decoration: none; }
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.day-btn { padding: 6px 10px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-size: 12px; font-family: 'DM Sans', sans-serif; cursor: pointer; }
+.day-btn.selected { background: var(--rose-light); color: var(--rose-dark); border-color: var(--rose-dark)44; font-weight: 500; }
 .confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; overflow: hidden; }
 .confetto { position: absolute; animation: fall linear forwards; }
 @keyframes fall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
@@ -146,6 +148,7 @@ textarea { resize: none; line-height: 1.6; }
     <button class="tab" id="tab-reminders" onclick="showTab('reminders')">Rappels</button>
     <button class="tab" id="tab-notes" onclick="showTab('notes')">Notes</button>
     <button class="tab" id="tab-contacts" onclick="showTab('contacts')">Contacts</button>
+    <button class="tab" id="tab-recurring" onclick="showTab('recurring')">🔄 Récurrentes</button>
   </div>
   <div class="content">
 
@@ -285,6 +288,35 @@ textarea { resize: none; line-height: 1.6; }
       <div id="notes-list"></div>
     </div>
 
+    <div class="panel" id="panel-recurring">
+      <div class="card">
+        <div class="card-title">Nouvelle tâche récurrente</div>
+        <input type="text" id="recurName" placeholder="Nom de la tâche..." />
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Se répète tous les :</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="recurDays">
+          <button class="day-btn" data-day="1" onclick="toggleDay(this)">Lun</button>
+          <button class="day-btn" data-day="2" onclick="toggleDay(this)">Mar</button>
+          <button class="day-btn" data-day="3" onclick="toggleDay(this)">Mer</button>
+          <button class="day-btn" data-day="4" onclick="toggleDay(this)">Jeu</button>
+          <button class="day-btn" data-day="5" onclick="toggleDay(this)">Ven</button>
+          <button class="day-btn" data-day="6" onclick="toggleDay(this)">Sam</button>
+          <button class="day-btn" data-day="0" onclick="toggleDay(this)">Dim</button>
+        </div>
+        <select id="recurColor" style="margin-bottom:8px;">
+          <option value="rose">Rose</option>
+          <option value="mint">Menthe</option>
+          <option value="peach">Pêche</option>
+          <option value="lav">Lavande</option>
+          <option value="warm">Doré</option>
+        </select>
+        <button class="btn" style="background:var(--rose-light);color:var(--rose-dark);width:100%;" onclick="addRecurring()">Ajouter</button>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);background:var(--lav-light);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px;line-height:1.6;">
+        Les tâches récurrentes apparaissent automatiquement dans Aujourd'hui les jours que tu choisis 🌸
+      </div>
+      <div id="recurring-list"></div>
+    </div>
+
     <div class="panel" id="panel-contacts">
       <div class="card">
         <div class="card-title">Nouveau contact</div>
@@ -307,12 +339,12 @@ const colorMap = {
   lav:   { bg: '#EEEDFE', dark: '#3C3489', border: '#AFA9EC33' },
   warm:  { bg: '#FAEEDA', dark: '#633806', border: '#EF9F2733' }
 };
-const tabColors = { today:'rose', tomorrow:'lav', wins:'mint', pomodoro:'rose', calendar:'peach', reminders:'warm', notes:'blue', contacts:'lav' };
+const tabColors = { today:'rose', tomorrow:'lav', wins:'mint', pomodoro:'rose', calendar:'peach', reminders:'warm', notes:'blue', contacts:'lav', recurring:'rose' };
 const tabColorMap = { rose:['#FBEAF0','#72243E'], lav:['#EEEDFE','#3C3489'], mint:['#E1F5EE','#085041'], peach:['#FAECE7','#712B13'], warm:['#FAEEDA','#633806'], blue:['#E6F1FB','#0C447C'] };
 const confettiColors = ['#ED93B1','#5DCAA5','#AFA9EC','#F0997B','#EF9F27','#72243E','#085041'];
 
 const KEY = 'phany_app_v5';
-let data = { today:[], tomorrow:[], wins:[], calEvents:[], reminders:[], notes:[], contacts:[] };
+let data = { today:[], tomorrow:[], wins:[], calEvents:[], reminders:[], notes:[], contacts:[], recurring:[] };
 let slotIdx = 1;
 
 function load() { try { const s = localStorage.getItem(KEY); if (s) { const d = JSON.parse(s); data = {...data, ...d}; } } catch(e) {} }
@@ -493,6 +525,7 @@ function showTab(tab) {
   if(tab==='tomorrow') renderTasks('tomorrow');
   if(tab==='notes') renderNotes();
   if(tab==='contacts') renderContacts();
+  if(tab==='recurring') renderRecurring();
 }
 
 function addTask(list) {
@@ -508,6 +541,69 @@ function addTask(list) {
   document.getElementById(stepsId).value='';
   save(); renderTasks(list);
 }
+
+// TÂCHES RÉCURRENTES
+function toggleDay(btn) {
+  btn.classList.toggle('selected');
+}
+
+function addRecurring() {
+  const name = document.getElementById('recurName').value.trim();
+  if (!name) return;
+  const selectedDays = [...document.querySelectorAll('.day-btn.selected')].map(b => parseInt(b.dataset.day));
+  if (!selectedDays.length) { showToast('Choisis au moins un jour !'); return; }
+  const color = document.getElementById('recurColor').value;
+  data.recurring.push({ id: Date.now(), name, days: selectedDays, color });
+  document.getElementById('recurName').value = '';
+  document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('selected'));
+  save(); renderRecurring();
+  injectRecurringToday();
+  showToast('Tâche récurrente ajoutée ! 🌸');
+}
+
+function injectRecurringToday() {
+  const todayDay = now.getDay();
+  data.recurring.forEach(r => {
+    if (r.days.includes(todayDay)) {
+      const alreadyExists = data.today.some(t => t.recurId === r.id);
+      if (!alreadyExists) {
+        data.today.push({ id: Date.now(), name: r.name, steps: [], done: false, color: r.color, recurId: r.id });
+      }
+    }
+  });
+  save();
+}
+
+function renderRecurring() {
+  const el = document.getElementById('recurring-list');
+  if (!data.recurring.length) { el.innerHTML = '<div class="empty-state">Aucune tâche récurrente.<br>Ajoute des tâches qui se répètent !</div>'; return; }
+  const dayNames = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+  el.innerHTML = data.recurring.map((r, i) => {
+    const c = colorMap[r.color] || colorMap.rose;
+    const daysLabel = r.days.map(d => dayNames[d]).join(', ');
+    return `<div class="task-card" style="background:${c.bg};border:1px solid ${c.border};">
+      <div class="task-header">
+        <div class="task-left">
+          <span style="font-size:16px;">🔄</span>
+          <div>
+            <div class="task-name" style="color:${c.dark}">${r.name}</div>
+            <div style="font-size:12px;color:${c.dark};opacity:0.7;margin-top:2px;">${daysLabel}</div>
+          </div>
+        </div>
+        <button class="icon-btn" style="color:${c.dark}" onclick="deleteRecurring(${i})">×</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function deleteRecurring(i) {
+  const id = data.recurring[i].id;
+  data.recurring.splice(i, 1);
+  data.today = data.today.filter(t => t.recurId !== id);
+  save(); renderRecurring(); renderTasks('today');
+}
+
+injectRecurringToday();
 
 function renderTasks(list) {
   const el = document.getElementById(list+'-tasks');
