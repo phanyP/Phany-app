@@ -1077,7 +1077,13 @@ function selectCat(el) {
 const recurLabels = { none:'', weekly:'Chaque semaine', monthly:'Chaque mois', yearly:'Chaque année' };
 
 function renderAgenda() {
-  document.getElementById('agendaDate').value = todayStr;
+  const dateEl = document.getElementById('agendaDate');
+  const recurEl = document.getElementById('agendaRecur');
+  if(dateEl) dateEl.value = todayStr;
+  if(recurEl) recurEl.value = 'none';
+  // Initialise la catégorie active visuellement
+  const firstCat = document.querySelector('.cat-btn');
+  if(firstCat && !document.querySelector('.cat-btn.active')) selectCat(firstCat);
   renderCalendar();
   renderAgendaList();
 }
@@ -1115,18 +1121,25 @@ function addAgendaSlot(){
 }
 
 function addAgendaItem(){
-  const text=document.getElementById('agendaText').value.trim();
-  const date=document.getElementById('agendaDate').value;
-  const recur=document.getElementById('agendaRecur').value;
-  if(!text||!date){ showToast('Remplis la description et la date !'); return; }
+  const textEl=document.getElementById('agendaText');
+  const dateEl=document.getElementById('agendaDate');
+  const recurEl=document.getElementById('agendaRecur');
+  const time1El=document.getElementById('agendaTime1');
+
+  if(!textEl||!dateEl){ showToast('Erreur — recharge la page !'); return; }
+  const text=textEl.value.trim();
+  const date=dateEl.value;
+  const recur=recurEl?recurEl.value:'none';
+  if(!text){ showToast('Écris une description !'); return; }
+  if(!date){ showToast('Choisis une date !'); return; }
 
   const slots=[];
-  const time1=document.getElementById('agendaTime1').value;
+  const time1=time1El?time1El.value:'';
   if(time1) slots.push({date,time:time1});
   for(let i=2;i<=agendaSlotIdx;i++){
-    const dateEl=document.getElementById('agendaDate'+i);
-    const timeEl=document.getElementById('agendaTime'+i);
-    if(dateEl&&timeEl&&timeEl.value) slots.push({date:dateEl.value||date,time:timeEl.value});
+    const dEl=document.getElementById('agendaDate'+i);
+    const tEl=document.getElementById('agendaTime'+i);
+    if(dEl&&tEl&&tEl.value) slots.push({date:dEl.value||date,time:tEl.value});
   }
 
   const item = { date, text, cat: currentCat.emoji, color: currentCat.color, dark: currentCat.dark, recur };
@@ -1138,10 +1151,10 @@ function addAgendaItem(){
     data.calEvents.push({id:Date.now(), ...item});
   }
 
-  document.getElementById('agendaText').value='';
-  document.getElementById('agendaDate').value=todayStr;
-  document.getElementById('agendaTime1').value='';
-  document.getElementById('agendaRecur').value='none';
+  textEl.value='';
+  dateEl.value=todayStr;
+  if(time1El) time1El.value='';
+  if(recurEl) recurEl.value='none';
   document.getElementById('agenda-extra-slots').innerHTML='';
   agendaSlotIdx=1;
   save();renderCalendar();renderAgendaList();
