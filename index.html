@@ -97,6 +97,23 @@ textarea { resize: none; line-height: 1.6; }
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .day-btn { padding: 6px 10px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-size: 12px; font-family: 'DM Sans', sans-serif; cursor: pointer; }
 .day-btn.selected { background: var(--rose-light); color: var(--rose-dark); border-color: var(--rose-dark)44; font-weight: 500; }
+
+/* VUE SEMAINE */
+.week-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.week-nav-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-muted); padding: 4px 8px; border-radius: 8px; }
+.week-label { font-size: 14px; font-weight: 500; color: var(--text); }
+.week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 12px; }
+.week-day-col { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.week-day-name { font-size: 11px; color: var(--text-muted); }
+.week-day-num { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; }
+.week-day-num.today { background: var(--rose-mid); color: white; font-weight: 500; }
+.week-day-num.selected-day { background: var(--rose-light); color: var(--rose-dark); font-weight: 500; }
+.week-day-num.has-task::after { content: ''; display: block; width: 4px; height: 4px; border-radius: 50%; background: var(--rose-mid); margin: 0 auto; }
+.week-tasks-area { min-height: 200px; }
+.week-task-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+.week-task-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.week-task-name { font-size: 14px; color: var(--text); flex: 1; }
+.week-event-item { background: var(--peach-light); border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 6px; font-size: 13px; color: var(--peach-dark); }
 .confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; overflow: hidden; }
 .confetto { position: absolute; animation: fall linear forwards; }
 @keyframes fall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
@@ -149,6 +166,7 @@ textarea { resize: none; line-height: 1.6; }
     <button class="tab" id="tab-notes" onclick="showTab('notes')">Notes</button>
     <button class="tab" id="tab-contacts" onclick="showTab('contacts')">Contacts</button>
     <button class="tab" id="tab-recurring" onclick="showTab('recurring')">🔄 Récurrentes</button>
+    <button class="tab" id="tab-week" onclick="showTab('week')">📅 Semaine</button>
   </div>
   <div class="content">
 
@@ -317,6 +335,19 @@ textarea { resize: none; line-height: 1.6; }
       <div id="recurring-list"></div>
     </div>
 
+    <div class="panel" id="panel-week">
+      <div class="card">
+        <div class="week-nav">
+          <button class="week-nav-btn" onclick="changeWeek(-1)">‹</button>
+          <div class="week-label" id="weekLabel"></div>
+          <button class="week-nav-btn" onclick="changeWeek(1)">›</button>
+        </div>
+        <div class="week-grid" id="weekGrid"></div>
+      </div>
+      <div id="week-day-title" style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:10px;"></div>
+      <div id="week-tasks-area"></div>
+    </div>
+
     <div class="panel" id="panel-contacts">
       <div class="card">
         <div class="card-title">Nouveau contact</div>
@@ -339,7 +370,7 @@ const colorMap = {
   lav:   { bg: '#EEEDFE', dark: '#3C3489', border: '#AFA9EC33' },
   warm:  { bg: '#FAEEDA', dark: '#633806', border: '#EF9F2733' }
 };
-const tabColors = { today:'rose', tomorrow:'lav', wins:'mint', pomodoro:'rose', calendar:'peach', reminders:'warm', notes:'blue', contacts:'lav', recurring:'rose' };
+const tabColors = { today:'rose', tomorrow:'lav', wins:'mint', pomodoro:'rose', calendar:'peach', reminders:'warm', notes:'blue', contacts:'lav', recurring:'rose', week:'peach' };
 const tabColorMap = { rose:['#FBEAF0','#72243E'], lav:['#EEEDFE','#3C3489'], mint:['#E1F5EE','#085041'], peach:['#FAECE7','#712B13'], warm:['#FAEEDA','#633806'], blue:['#E6F1FB','#0C447C'] };
 const confettiColors = ['#ED93B1','#5DCAA5','#AFA9EC','#F0997B','#EF9F27','#72243E','#085041'];
 
@@ -526,6 +557,7 @@ function showTab(tab) {
   if(tab==='notes') renderNotes();
   if(tab==='contacts') renderContacts();
   if(tab==='recurring') renderRecurring();
+  if(tab==='week') renderWeek();
 }
 
 function addTask(list) {
@@ -572,6 +604,86 @@ function injectRecurringToday() {
     }
   });
   save();
+}
+
+// VUE SEMAINE
+let weekOffset = 0;
+let selectedWeekDay = null;
+
+function getWeekStart(offset) {
+  const d = new Date(now);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  d.setDate(diff + offset * 7);
+  d.setHours(0,0,0,0);
+  return d;
+}
+
+function changeWeek(dir) { weekOffset += dir; renderWeek(); }
+
+function renderWeek() {
+  const weekStart = getWeekStart(weekOffset);
+  const weekEnd = new Date(weekStart); weekEnd.setDate(weekEnd.getDate() + 6);
+  const dayNames = ['L','M','M','J','V','S','D'];
+  const label = weekStart.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) + ' – ' + weekEnd.toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('weekLabel').textContent = label;
+
+  let html = '';
+  for(let i=0;i<7;i++) {
+    const d = new Date(weekStart); d.setDate(d.getDate()+i);
+    const ds = d.toISOString().split('T')[0];
+    const isToday = ds === todayStr;
+    const isSelected = selectedWeekDay === ds;
+    const hasTasks = data.today.some(t => !t.done) && ds === todayStr;
+    const hasEvents = data.calEvents.some(e => e.date === ds);
+    const hasDot = hasTasks || hasEvents;
+    html += `<div class="week-day-col">
+      <div class="week-day-name">${dayNames[i]}</div>
+      <div class="week-day-num ${isToday?'today':''} ${isSelected&&!isToday?'selected-day':''}" onclick="selectWeekDay('${ds}')">${d.getDate()}${hasDot?'<span style="display:block;width:4px;height:4px;border-radius:50%;background:'+(isToday?'white':'#ED93B1')+';margin:0 auto;"></span>':''}</div>
+    </div>`;
+  }
+  document.getElementById('weekGrid').innerHTML = html;
+
+  if(!selectedWeekDay) selectedWeekDay = todayStr;
+  renderWeekDay(selectedWeekDay);
+}
+
+function selectWeekDay(ds) {
+  selectedWeekDay = ds;
+  renderWeek();
+}
+
+function renderWeekDay(ds) {
+  const d = new Date(ds+'T12:00');
+  const title = d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('week-day-title').textContent = title.charAt(0).toUpperCase()+title.slice(1);
+
+  let html = '';
+  const events = data.calEvents.filter(e=>e.date===ds);
+  events.forEach(e=>{
+    html += `<div class="week-event-item">📅 ${e.text}</div>`;
+  });
+
+  if(ds === todayStr) {
+    data.today.forEach(t=>{
+      const c = colorMap[t.color]||colorMap.rose;
+      html += `<div class="week-task-item">
+        <div class="week-task-dot" style="background:${c.dark};"></div>
+        <div class="week-task-name ${t.done?'done':''}">${t.name}</div>
+      </div>`;
+    });
+  } else if(ds === new Date(now.getTime()+86400000).toISOString().split('T')[0]) {
+    data.tomorrow.forEach(t=>{
+      const c = colorMap[t.color]||colorMap.rose;
+      html += `<div class="week-task-item">
+        <div class="week-task-dot" style="background:${c.dark};"></div>
+        <div class="week-task-name">${t.name}</div>
+      </div>`;
+    });
+  }
+
+  if(!html) html = '<div class="empty-state" style="padding:20px;">Rien de prévu ce jour 🌸</div>';
+  document.getElementById('week-tasks-area').innerHTML = html;
 }
 
 function renderRecurring() {
