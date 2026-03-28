@@ -341,42 +341,7 @@ textarea { resize: none; line-height: 1.6; }
         </div>
         <div class="cal-grid" id="calGrid"></div>
       </div>
-
-      <div class="card">
-        <div class="card-title">Ajouter un événement ou rappel</div>
-        <input type="text" id="agendaText" placeholder="Description..." />
-
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Catégorie :</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="agendaCatPicker">
-          <button class="cat-btn active" data-cat="🎂" data-color="#FBEAF0" data-dark="#72243E" onclick="selectCat(this)">🎂 Anniversaire</button>
-          <button class="cat-btn" data-cat="🍽️" data-color="#FAECE7" data-dark="#712B13" onclick="selectCat(this)">🍽️ Repas</button>
-          <button class="cat-btn" data-cat="🏥" data-color="#EEEDFE" data-dark="#3C3489" onclick="selectCat(this)">🏥 Rendez-vous</button>
-          <button class="cat-btn" data-cat="💊" data-color="#E1F5EE" data-dark="#085041" onclick="selectCat(this)">💊 Médical</button>
-          <button class="cat-btn" data-cat="🎉" data-color="#FAEEDA" data-dark="#633806" onclick="selectCat(this)">🎉 Fête</button>
-          <button class="cat-btn" data-cat="🏃" data-color="#EAF3DE" data-dark="#27500A" onclick="selectCat(this)">🏃 Sport</button>
-          <button class="cat-btn" data-cat="✈️" data-color="#E6F1FB" data-dark="#0C447C" onclick="selectCat(this)">✈️ Voyage</button>
-          <button class="cat-btn" data-cat="📋" data-color="#F1EFE8" data-dark="#2C2C2A" onclick="selectCat(this)">📋 Autre</button>
-        </div>
-
-        <div class="two-col">
-          <input type="date" id="agendaDate" />
-          <input type="time" id="agendaTime1" placeholder="Heure (optionnel)" />
-        </div>
-
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Répétition :</div>
-        <select id="agendaRecur" style="margin-bottom:10px;">
-          <option value="none">Une seule fois</option>
-          <option value="weekly">Chaque semaine</option>
-          <option value="monthly">Chaque mois</option>
-          <option value="yearly">Chaque année</option>
-        </select>
-
-        <div id="agenda-extra-slots"></div>
-        <button class="add-slot-btn" onclick="addAgendaSlot()">+ Ajouter un autre horaire de rappel</button>
-        <div style="height:8px;"></div>
-        <button class="btn" style="background:var(--peach-light);color:var(--peach-dark);width:100%;" onclick="addAgendaItem()">Ajouter</button>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:6px;" id="agenda-notif-status"></div>
-      </div>
+      <div id="agenda-form-area"></div>
       <div id="agenda-events-list"></div>
     </div>
 
@@ -1077,13 +1042,108 @@ function selectCat(el) {
 const recurLabels = { none:'', weekly:'Chaque semaine', monthly:'Chaque mois', yearly:'Chaque année' };
 
 function renderAgenda() {
-  const dateEl = document.getElementById('agendaDate');
-  const recurEl = document.getElementById('agendaRecur');
-  if(dateEl) dateEl.value = todayStr;
-  if(recurEl) recurEl.value = 'none';
-  // Initialise la catégorie active visuellement
-  const firstCat = document.querySelector('.cat-btn');
-  if(firstCat && !document.querySelector('.cat-btn.active')) selectCat(firstCat);
+  agendaSlotIdx = 1;
+  currentCat = { emoji:'🎂', color:'#FBEAF0', dark:'#72243E' };
+
+  document.getElementById('agenda-form-area').innerHTML = `
+    <div class="card">
+      <div class="card-title">Ajouter un événement ou rappel</div>
+      <input type="text" id="agendaText" placeholder="Description..." />
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Catégorie :</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+        <button class="cat-btn active" id="cat-anniv" style="background:#FBEAF0;color:#72243E;border-color:#72243E66;">🎂 Anniversaire</button>
+        <button class="cat-btn" id="cat-repas">🍽️ Repas</button>
+        <button class="cat-btn" id="cat-rdv">🏥 Rendez-vous</button>
+        <button class="cat-btn" id="cat-med">💊 Médical</button>
+        <button class="cat-btn" id="cat-fete">🎉 Fête</button>
+        <button class="cat-btn" id="cat-sport">🏃 Sport</button>
+        <button class="cat-btn" id="cat-voyage">✈️ Voyage</button>
+        <button class="cat-btn" id="cat-autre">📋 Autre</button>
+      </div>
+      <div class="two-col">
+        <input type="date" id="agendaDate" value="${todayStr}" />
+        <input type="time" id="agendaTime1" />
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Répétition :</div>
+      <select id="agendaRecur" style="margin-bottom:10px;">
+        <option value="none">Une seule fois</option>
+        <option value="weekly">Chaque semaine</option>
+        <option value="monthly">Chaque mois</option>
+        <option value="yearly">Chaque année</option>
+      </select>
+      <div id="agenda-extra-slots"></div>
+      <button id="agendaAddSlotBtn" class="add-slot-btn">+ Ajouter un autre horaire de rappel</button>
+      <div style="height:8px;"></div>
+      <button id="agendaSubmitBtn" class="btn" style="background:var(--peach-light);color:var(--peach-dark);width:100%;">Ajouter</button>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:6px;" id="agenda-notif-status"></div>
+    </div>`;
+
+  // Bind category buttons
+  const cats = [
+    {id:'cat-anniv', emoji:'🎂', color:'#FBEAF0', dark:'#72243E'},
+    {id:'cat-repas', emoji:'🍽️', color:'#FAECE7', dark:'#712B13'},
+    {id:'cat-rdv',   emoji:'🏥', color:'#EEEDFE', dark:'#3C3489'},
+    {id:'cat-med',   emoji:'💊', color:'#E1F5EE', dark:'#085041'},
+    {id:'cat-fete',  emoji:'🎉', color:'#FAEEDA', dark:'#633806'},
+    {id:'cat-sport', emoji:'🏃', color:'#EAF3DE', dark:'#27500A'},
+    {id:'cat-voyage',emoji:'✈️', color:'#E6F1FB', dark:'#0C447C'},
+    {id:'cat-autre', emoji:'📋', color:'#F1EFE8', dark:'#2C2C2A'},
+  ];
+  cats.forEach(c => {
+    const btn = document.getElementById(c.id);
+    if(btn) btn.addEventListener('click', () => {
+      cats.forEach(x => {
+        const b = document.getElementById(x.id);
+        if(b){ b.style.background='transparent'; b.style.color='var(--text-muted)'; b.style.borderColor='var(--border)'; }
+      });
+      btn.style.background = c.color;
+      btn.style.color = c.dark;
+      btn.style.borderColor = c.dark+'66';
+      currentCat = { emoji:c.emoji, color:c.color, dark:c.dark };
+    });
+  });
+
+  // Bind add slot button
+  document.getElementById('agendaAddSlotBtn').addEventListener('click', () => {
+    agendaSlotIdx++;
+    const div = document.createElement('div');
+    div.className = 'two-col'; div.style.marginBottom = '8px';
+    div.innerHTML = `<input type="date" id="agendaDate${agendaSlotIdx}" value="${todayStr}" /><input type="time" id="agendaTime${agendaSlotIdx}" />`;
+    document.getElementById('agenda-extra-slots').appendChild(div);
+  });
+
+  // Bind submit button
+  document.getElementById('agendaSubmitBtn').addEventListener('click', () => {
+    const text = document.getElementById('agendaText').value.trim();
+    const date = document.getElementById('agendaDate').value;
+    const recur = document.getElementById('agendaRecur').value;
+    const time1 = document.getElementById('agendaTime1').value;
+
+    if(!text){ showToast('Écris une description !'); return; }
+    if(!date){ showToast('Choisis une date !'); return; }
+
+    const slots = [];
+    if(time1) slots.push({date, time:time1});
+    for(let i=2; i<=agendaSlotIdx; i++){
+      const dEl = document.getElementById('agendaDate'+i);
+      const tEl = document.getElementById('agendaTime'+i);
+      if(dEl && tEl && tEl.value) slots.push({date: dEl.value||date, time: tEl.value});
+    }
+
+    const item = { date, text, cat: currentCat.emoji, color: currentCat.color, dark: currentCat.dark, recur };
+
+    if(slots.length > 0){
+      data.reminders.push({id: Date.now(), ...item, slots});
+      slots.forEach(s => scheduleOne(text, s.date, s.time));
+    } else {
+      data.calEvents.push({id: Date.now(), ...item});
+    }
+
+    save(); renderCalendar(); renderAgendaList();
+    showToast('Ajouté à l\'agenda ! 📅');
+    renderAgenda();
+  });
+
   renderCalendar();
   renderAgendaList();
 }
