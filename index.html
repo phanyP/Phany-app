@@ -121,6 +121,19 @@ textarea { resize: none; line-height: 1.6; }
 .priority-important { background: #FAEEDA; color: #633806; }
 .priority-normal { background: #EAF3DE; color: #27500A; }
 .priority-select { -webkit-appearance: none; appearance: none; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); font-size: 12px; font-family: 'DM Sans', sans-serif; cursor: pointer; background: var(--bg); color: var(--text-muted); }
+
+/* PARAMÈTRES */
+.settings-section { margin-bottom: 20px; }
+.settings-label { font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+.color-picker-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.color-swatch { width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: all 0.15s; flex-shrink: 0; }
+.color-swatch.active { border-color: var(--text); transform: scale(1.15); }
+.emoji-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.emoji-opt { width: 40px; height: 40px; border-radius: 50%; background: var(--rose-light); display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; border: 3px solid transparent; transition: all 0.15s; }
+.emoji-opt.active { border-color: var(--rose-dark); transform: scale(1.15); }
+.settings-preview { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.preview-avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+.preview-name { font-family: 'DM Serif Display', serif; font-size: 20px; }
 .confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; overflow: hidden; }
 .confetto { position: absolute; animation: fall linear forwards; }
 @keyframes fall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
@@ -174,6 +187,7 @@ textarea { resize: none; line-height: 1.6; }
     <button class="tab" id="tab-contacts" onclick="showTab('contacts')">Contacts</button>
     <button class="tab" id="tab-recurring" onclick="showTab('recurring')">🔄 Récurrentes</button>
     <button class="tab" id="tab-week" onclick="showTab('week')">📅 Semaine</button>
+    <button class="tab" id="tab-settings" onclick="showTab('settings')">⚙️ Paramètres</button>
   </div>
   <div class="content">
 
@@ -365,6 +379,54 @@ textarea { resize: none; line-height: 1.6; }
       <div id="week-tasks-area"></div>
     </div>
 
+    <div class="panel" id="panel-settings">
+      <div class="card settings-preview" id="settingsPreview">
+        <div class="preview-avatar" id="previewAvatar">🌸</div>
+        <div>
+          <div class="preview-name" id="previewName">Bonjour Phany</div>
+          <div style="font-size:12px;color:var(--text-muted);">Aperçu en temps réel</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="settings-section">
+          <div class="settings-label">Ton prénom</div>
+          <input type="text" id="settingsName" placeholder="Ton prénom..." oninput="previewSettings()" />
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-label">Ton emoji avatar</div>
+          <div class="emoji-row" id="emojiRow">
+            <div class="emoji-opt active" data-emoji="🌸" onclick="selectEmoji(this)">🌸</div>
+            <div class="emoji-opt" data-emoji="🦁" onclick="selectEmoji(this)">🦁</div>
+            <div class="emoji-opt" data-emoji="🌺" onclick="selectEmoji(this)">🌺</div>
+            <div class="emoji-opt" data-emoji="⭐" onclick="selectEmoji(this)">⭐</div>
+            <div class="emoji-opt" data-emoji="🦋" onclick="selectEmoji(this)">🦋</div>
+            <div class="emoji-opt" data-emoji="🌙" onclick="selectEmoji(this)">🌙</div>
+            <div class="emoji-opt" data-emoji="🌈" onclick="selectEmoji(this)">🌈</div>
+            <div class="emoji-opt" data-emoji="💎" onclick="selectEmoji(this)">💎</div>
+            <div class="emoji-opt" data-emoji="🔥" onclick="selectEmoji(this)">🔥</div>
+            <div class="emoji-opt" data-emoji="🎯" onclick="selectEmoji(this)">🎯</div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-label">Couleur principale</div>
+          <div class="color-picker-row" id="colorPickerRow">
+            <div class="color-swatch active" data-color="#ED93B1" data-light="#FBEAF0" data-dark="#72243E" style="background:#ED93B1;" onclick="selectTheme(this)"></div>
+            <div class="color-swatch" data-color="#5DCAA5" data-light="#E1F5EE" data-dark="#085041" style="background:#5DCAA5;" onclick="selectTheme(this)"></div>
+            <div class="color-swatch" data-color="#AFA9EC" data-light="#EEEDFE" data-dark="#3C3489" style="background:#AFA9EC;" onclick="selectTheme(this)"></div>
+            <div class="color-swatch" data-color="#F0997B" data-light="#FAECE7" data-dark="#712B13" style="background:#F0997B;" onclick="selectTheme(this)"></div>
+            <div class="color-swatch" data-color="#EF9F27" data-light="#FAEEDA" data-dark="#633806" style="background:#EF9F27;" onclick="selectTheme(this)"></div>
+            <div class="color-swatch" data-color="#378ADD" data-light="#E6F1FB" data-dark="#0C447C" style="background:#378ADD;" onclick="selectTheme(this)"></div>
+            <div class="color-swatch" data-color="#E24B4A" data-light="#FCEBEB" data-dark="#501313" style="background:#E24B4A;" onclick="selectTheme(this)"></div>
+          </div>
+        </div>
+
+        <button class="btn" style="background:var(--rose-light);color:var(--rose-dark);width:100%;" onclick="saveSettings()">Enregistrer mes paramètres</button>
+      </div>
+    </div>
+
     <div class="panel" id="panel-contacts">
       <div class="card">
         <div class="card-title">Nouveau contact</div>
@@ -387,12 +449,12 @@ const colorMap = {
   lav:   { bg: '#EEEDFE', dark: '#3C3489', border: '#AFA9EC33' },
   warm:  { bg: '#FAEEDA', dark: '#633806', border: '#EF9F2733' }
 };
-const tabColors = { today:'rose', tomorrow:'lav', wins:'mint', pomodoro:'rose', calendar:'peach', reminders:'warm', notes:'blue', contacts:'lav', recurring:'rose', week:'peach' };
+const tabColors = { today:'rose', tomorrow:'lav', wins:'mint', pomodoro:'rose', calendar:'peach', reminders:'warm', notes:'blue', contacts:'lav', recurring:'rose', week:'peach', settings:'lav' };
 const tabColorMap = { rose:['#FBEAF0','#72243E'], lav:['#EEEDFE','#3C3489'], mint:['#E1F5EE','#085041'], peach:['#FAECE7','#712B13'], warm:['#FAEEDA','#633806'], blue:['#E6F1FB','#0C447C'] };
 const confettiColors = ['#ED93B1','#5DCAA5','#AFA9EC','#F0997B','#EF9F27','#72243E','#085041'];
 
 const KEY = 'phany_app_v5';
-let data = { today:[], tomorrow:[], wins:[], calEvents:[], reminders:[], notes:[], contacts:[], recurring:[] };
+let data = { today:[], tomorrow:[], wins:[], calEvents:[], reminders:[], notes:[], contacts:[], recurring:[], settings:{ name:'Phany', emoji:'🌸', themeColor:'#ED93B1', themeLight:'#FBEAF0', themeDark:'#72243E' } };
 let slotIdx = 1;
 
 function load() { try { const s = localStorage.getItem(KEY); if (s) { const d = JSON.parse(s); data = {...data, ...d}; } } catch(e) {} }
@@ -575,6 +637,7 @@ function showTab(tab) {
   if(tab==='contacts') renderContacts();
   if(tab==='recurring') renderRecurring();
   if(tab==='week') renderWeek();
+  if(tab==='settings') initSettings();
 }
 
 function addTask(list) {
@@ -609,6 +672,68 @@ function addRecurring() {
   save(); renderRecurring();
   injectRecurringToday();
   showToast('Tâche récurrente ajoutée ! 🌸');
+}
+
+// PARAMÈTRES
+let currentEmoji = '🌸';
+let currentTheme = { color:'#ED93B1', light:'#FBEAF0', dark:'#72243E' };
+
+function applyTheme(light, mid, dark) {
+  document.documentElement.style.setProperty('--rose-light', light);
+  document.documentElement.style.setProperty('--rose-mid', mid);
+  document.documentElement.style.setProperty('--rose-dark', dark);
+}
+
+function applySettings() {
+  const s = data.settings;
+  applyTheme(s.themeLight, s.themeColor, s.themeDark);
+  document.getElementById('dateDisplay').parentElement.querySelector('.header-name').textContent = 'Bonjour ' + s.name;
+  document.querySelector('.avatar').textContent = s.emoji;
+}
+
+function initSettings() {
+  const s = data.settings;
+  document.getElementById('settingsName').value = s.name;
+  currentEmoji = s.emoji;
+  currentTheme = { color: s.themeColor, light: s.themeLight, dark: s.themeDark };
+  document.querySelectorAll('.emoji-opt').forEach(e => {
+    e.classList.toggle('active', e.dataset.emoji === s.emoji);
+  });
+  document.querySelectorAll('.color-swatch').forEach(e => {
+    e.classList.toggle('active', e.dataset.color === s.themeColor);
+  });
+  updatePreview();
+}
+
+function selectEmoji(el) {
+  document.querySelectorAll('.emoji-opt').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  currentEmoji = el.dataset.emoji;
+  updatePreview();
+}
+
+function selectTheme(el) {
+  document.querySelectorAll('.color-swatch').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  currentTheme = { color: el.dataset.color, light: el.dataset.light, dark: el.dataset.dark };
+  updatePreview();
+}
+
+function previewSettings() { updatePreview(); }
+
+function updatePreview() {
+  const name = document.getElementById('settingsName').value.trim() || 'Phany';
+  document.getElementById('previewName').textContent = 'Bonjour ' + name;
+  document.getElementById('previewAvatar').textContent = currentEmoji;
+  document.getElementById('previewAvatar').style.background = currentTheme.light;
+}
+
+function saveSettings() {
+  const name = document.getElementById('settingsName').value.trim() || 'Phany';
+  data.settings = { name, emoji: currentEmoji, themeColor: currentTheme.color, themeLight: currentTheme.light, themeDark: currentTheme.dark };
+  save();
+  applySettings();
+  showToast('Paramètres enregistrés ! 🌸');
 }
 
 function injectRecurringToday() {
@@ -958,6 +1083,7 @@ function renderContacts(){
 function deleteContact(i){data.contacts.splice(i,1);save();renderContacts();}
 
 renderTasks('today');
+applySettings();
 </script>
 </body>
 </html>
