@@ -1,111 +1,119 @@
 <!DOCTYPE html>
-<!-- saved from url=(0060)file:///C:/Users/stephanie.pelard/Downloads/index%20(2).html -->
-<html lang="fr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Mon App">
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="Mon App" />
 <title>Mon App — Phany</title>
 <link rel="apple-touch-icon" href="icon.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Serif+Display&display=swap" rel="stylesheet" />
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --rose-light: #FBEAF0; --rose-mid: #ED93B1; --rose-dark: #72243E;
-    --mint-light: #E1F5EE; --mint-mid: #5DCAA5; --mint-dark: #085041;
-    --peach-light: #FAECE7; --peach-mid: #F0997B; --peach-dark: #712B13;
-    --lav-light: #EEEDFE; --lav-mid: #AFA9EC; --lav-dark: #3C3489;
-    --warm-light: #FAEEDA; --warm-mid: #EF9F27; --warm-dark: #633806;
-    --blue-light: #E6F1FB; --blue-mid: #378ADD; --blue-dark: #0C447C;
-    --green-light: #EAF3DE; --green-mid: #639922; --green-dark: #173404;
-    --bg: #FDF8F6; --surface: #FFFFFF; --border: rgba(0,0,0,0.08);
-    --text: #2C2C2A; --text-muted: #888780; --radius: 16px; --radius-sm: 10px;
-  }
-  html, body { height: 100%; background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); overflow: hidden; }
-  .app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; max-width: 480px; margin: 0 auto; }
-  .header { padding: 52px 20px 12px; background: var(--bg); flex-shrink: 0; }
-  .header-top { display: flex; align-items: center; gap: 12px; }
-  .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--rose-light); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-  .header-name { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); line-height: 1; }
-  .header-date { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
-  .tabs { display: flex; gap: 6px; padding: 10px 20px 0; overflow-x: auto; flex-shrink: 0; scrollbar-width: none; }
-  .tabs::-webkit-scrollbar { display: none; }
-  .tab { padding: 7px 13px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; white-space: nowrap; transition: all 0.15s ease; flex-shrink: 0; }
-  .tab.active { font-weight: 500; }
-  .content { flex: 1; overflow-y: auto; padding: 14px 20px 32px; scrollbar-width: none; }
-  .content::-webkit-scrollbar { display: none; }
-  .panel { display: none; }
-  .panel.active { display: block; }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
-  .card-title { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
-  input[type="text"], input[type="time"], input[type="date"], input[type="tel"], input[type="email"], textarea, select {
-    width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
-    font-size: 15px; font-family: 'DM Sans', sans-serif; color: var(--text); background: var(--bg);
-    margin-bottom: 8px; outline: none; -webkit-appearance: none; appearance: none;
-  }
-  input:focus, textarea:focus, select:focus { border-color: var(--rose-mid); }
-  textarea { resize: none; line-height: 1.6; }
-  .btn { padding: 10px 16px; border-radius: var(--radius-sm); border: none; font-size: 13px; font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer; transition: opacity 0.15s; }
-  .btn:active { opacity: 0.7; }
-  .btn-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .task-card { border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; }
-  .task-header { display: flex; align-items: flex-start; justify-content: space-between; }
-  .task-left { display: flex; align-items: flex-start; gap: 10px; flex: 1; }
-  .task-name { font-size: 15px; font-weight: 500; line-height: 1.3; }
-  .task-name.done { text-decoration: line-through; opacity: 0.5; }
-  .task-actions { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
-  .icon-btn { background: none; border: none; cursor: pointer; font-size: 15px; opacity: 0.4; padding: 2px 4px; line-height: 1; color: inherit; border-radius: 6px; }
-  .icon-btn:hover { opacity: 0.7; background: rgba(0,0,0,0.05); }
-  .move-btn { font-size: 12px; padding: 3px 8px; border-radius: 20px; border: 1px solid rgba(0,0,0,0.15); background: rgba(255,255,255,0.6); cursor: pointer; color: inherit; font-family: 'DM Sans', sans-serif; opacity: 0.7; }
-  .move-btn:active { opacity: 1; }
-  .steps { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.06); }
-  .step-row { display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; }
-  .step-text { font-size: 13px; line-height: 1.5; flex: 1; }
-  .step-text.done { text-decoration: line-through; opacity: 0.45; }
-  .check { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid rgba(0,0,0,0.2); background: transparent; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; -webkit-appearance: none; appearance: none; margin-top: 1px; }
-  .check:checked { background: var(--rose-mid); border-color: var(--rose-mid); background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4l3 3 5-6' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-size: 60%; background-position: center; background-repeat: no-repeat; }
-  .empty-state { text-align: center; color: var(--text-muted); font-size: 14px; padding: 40px 20px; line-height: 1.7; }
-  .win-card { background: var(--mint-light); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-start; }
-  .win-text { font-size: 14px; color: var(--mint-dark); flex: 1; line-height: 1.5; }
-  .win-date { font-size: 12px; color: var(--mint-mid); margin-top: 3px; }
-  .auto-badge { font-size: 11px; background: var(--mint-light); color: var(--mint-dark); border: 1px solid var(--mint-mid); border-radius: 20px; padding: 2px 8px; display: inline-block; margin-top: 4px; }
-  .cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-  .cal-nav-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-muted); padding: 4px 8px; border-radius: 8px; }
-  .cal-month-label { font-size: 15px; font-weight: 500; color: var(--text); }
-  .cal-days-header { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 6px; }
-  .cal-day-label { text-align: center; font-size: 11px; color: var(--text-muted); padding: 4px 0; }
-  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-  .cal-cell { text-align: center; padding: 7px 2px; border-radius: 8px; font-size: 13px; cursor: pointer; position: relative; transition: background 0.1s; }
-  .cal-cell:active { background: var(--rose-light); }
-  .cal-cell.today { background: var(--rose-light); color: var(--rose-dark); font-weight: 500; }
-  .cal-cell.has-event::after { content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: var(--rose-mid); }
-  .event-item { background: var(--peach-light); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-  .event-text { font-size: 14px; color: var(--peach-dark); }
-  .event-date { font-size: 12px; color: var(--peach-mid); margin-top: 2px; }
-  .reminder-card { background: var(--warm-light); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; }
-  .reminder-header { display: flex; justify-content: space-between; align-items: flex-start; }
-  .reminder-title { font-size: 14px; font-weight: 500; color: var(--warm-dark); flex: 1; }
-  .reminder-slots { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
-  .reminder-slot { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.5); border-radius: 8px; padding: 6px 10px; }
-  .reminder-slot-text { font-size: 12px; color: var(--warm-dark); }
-  .add-slot-btn { font-size: 12px; color: var(--warm-dark); background: rgba(255,255,255,0.6); border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; padding: 5px 10px; cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 6px; width: 100%; }
-  .section-label { font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 16px 0 8px; }
-  .note-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; }
-  .note-title-display { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
-  .note-body-display { font-size: 13px; color: var(--text-muted); line-height: 1.6; white-space: pre-wrap; }
-  .note-date { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
-  .contact-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
-  .contact-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--lav-light); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 500; color: var(--lav-dark); flex-shrink: 0; }
-  .contact-info { flex: 1; }
-  .contact-name { font-size: 14px; font-weight: 500; color: var(--text); }
-  .contact-detail { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-  .contact-actions { display: flex; gap: 6px; }
-  .contact-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; text-decoration: none; }
-  .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); z-index: 100; display: flex; align-items: flex-end; justify-content: center; }
-  .modal { background: var(--surface); border-radius: 20px 20px 0 0; padding: 20px; width: 100%; max-width: 480px; max-height: 80vh; overflow-y: auto; }
-  .modal-title { font-size: 16px; font-weight: 500; color: var(--text); margin-bottom: 16px; }
-  .hidden { display: none; }
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --rose-light: #FBEAF0; --rose-mid: #ED93B1; --rose-dark: #72243E;
+  --mint-light: #E1F5EE; --mint-mid: #5DCAA5; --mint-dark: #085041;
+  --peach-light: #FAECE7; --peach-mid: #F0997B; --peach-dark: #712B13;
+  --lav-light: #EEEDFE; --lav-mid: #AFA9EC; --lav-dark: #3C3489;
+  --warm-light: #FAEEDA; --warm-mid: #EF9F27; --warm-dark: #633806;
+  --blue-light: #E6F1FB; --blue-mid: #378ADD; --blue-dark: #0C447C;
+  --bg: #FDF8F6; --surface: #FFFFFF; --border: rgba(0,0,0,0.08);
+  --text: #2C2C2A; --text-muted: #888780; --radius: 16px; --radius-sm: 10px;
+}
+html, body { height: 100%; background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); overflow: hidden; }
+.app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; max-width: 480px; margin: 0 auto; }
+.header { padding: 52px 20px 12px; background: var(--bg); flex-shrink: 0; }
+.header-top { display: flex; align-items: center; gap: 12px; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--rose-light); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.header-name { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); line-height: 1; }
+.header-date { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+.tabs { display: flex; gap: 6px; padding: 10px 20px 0; overflow-x: auto; flex-shrink: 0; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { padding: 7px 13px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; white-space: nowrap; transition: all 0.15s ease; flex-shrink: 0; }
+.tab.active { font-weight: 500; }
+.content { flex: 1; overflow-y: auto; padding: 14px 20px 32px; scrollbar-width: none; }
+.content::-webkit-scrollbar { display: none; }
+.panel { display: none; }
+.panel.active { display: block; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+.card-title { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+input[type="text"], input[type="time"], input[type="date"], input[type="tel"], textarea, select {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 15px; font-family: 'DM Sans', sans-serif; color: var(--text); background: var(--bg);
+  margin-bottom: 8px; outline: none; -webkit-appearance: none; appearance: none;
+}
+input:focus, textarea:focus, select:focus { border-color: var(--rose-mid); }
+textarea { resize: none; line-height: 1.6; }
+.btn { padding: 10px 16px; border-radius: var(--radius-sm); border: none; font-size: 13px; font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer; transition: opacity 0.15s; }
+.btn:active { opacity: 0.7; }
+.btn-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.task-card { border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; transition: transform 0.2s; }
+.task-card.celebrate { animation: popcard 0.4s ease; }
+@keyframes popcard { 0%{transform:scale(1)} 50%{transform:scale(1.03)} 100%{transform:scale(1)} }
+.task-header { display: flex; align-items: flex-start; justify-content: space-between; }
+.task-left { display: flex; align-items: flex-start; gap: 10px; flex: 1; }
+.task-name { font-size: 15px; font-weight: 500; line-height: 1.3; }
+.task-name.done { text-decoration: line-through; opacity: 0.5; }
+.task-actions { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
+.icon-btn { background: none; border: none; cursor: pointer; font-size: 15px; opacity: 0.4; padding: 2px 4px; line-height: 1; color: inherit; border-radius: 6px; }
+.move-btn { font-size: 12px; padding: 3px 8px; border-radius: 20px; border: 1px solid rgba(0,0,0,0.15); background: rgba(255,255,255,0.6); cursor: pointer; color: inherit; font-family: 'DM Sans', sans-serif; opacity: 0.7; }
+.steps { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.06); }
+.step-row { display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; }
+.step-text { font-size: 13px; line-height: 1.5; flex: 1; }
+.step-text.done { text-decoration: line-through; opacity: 0.45; }
+.check { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid rgba(0,0,0,0.2); background: transparent; cursor: pointer; flex-shrink: 0; transition: all 0.15s; -webkit-appearance: none; appearance: none; margin-top: 1px; }
+.check:checked { background: var(--rose-mid); border-color: var(--rose-mid); background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4l3 3 5-6' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-size: 60%; background-position: center; background-repeat: no-repeat; }
+.empty-state { text-align: center; color: var(--text-muted); font-size: 14px; padding: 40px 20px; line-height: 1.7; }
+.win-card { background: var(--mint-light); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-start; }
+.win-text { font-size: 14px; color: var(--mint-dark); flex: 1; line-height: 1.5; }
+.win-date { font-size: 12px; color: var(--mint-mid); margin-top: 3px; }
+.auto-badge { font-size: 11px; background: var(--mint-light); color: var(--mint-dark); border: 1px solid var(--mint-mid); border-radius: 20px; padding: 2px 8px; display: inline-block; margin-top: 4px; }
+.cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.cal-nav-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-muted); padding: 4px 8px; border-radius: 8px; }
+.cal-month-label { font-size: 15px; font-weight: 500; color: var(--text); }
+.cal-days-header { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 6px; }
+.cal-day-label { text-align: center; font-size: 11px; color: var(--text-muted); padding: 4px 0; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.cal-cell { text-align: center; padding: 7px 2px; border-radius: 8px; font-size: 13px; cursor: pointer; position: relative; }
+.cal-cell.today { background: var(--rose-light); color: var(--rose-dark); font-weight: 500; }
+.cal-cell.has-event::after { content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: var(--rose-mid); }
+.event-item { background: var(--peach-light); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+.event-text { font-size: 14px; color: var(--peach-dark); }
+.event-date { font-size: 12px; color: var(--peach-mid); margin-top: 2px; }
+.reminder-card { background: var(--warm-light); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; }
+.reminder-title { font-size: 14px; font-weight: 500; color: var(--warm-dark); flex: 1; }
+.reminder-slot { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.5); border-radius: 8px; padding: 6px 10px; margin-top: 4px; }
+.reminder-slot-text { font-size: 12px; color: var(--warm-dark); }
+.add-slot-btn { font-size: 12px; color: var(--warm-dark); background: rgba(255,255,255,0.6); border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; padding: 5px 10px; cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 6px; width: 100%; }
+.section-label { font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 16px 0 8px; }
+.note-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; }
+.note-title-display { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+.note-body-display { font-size: 13px; color: var(--text-muted); line-height: 1.6; white-space: pre-wrap; }
+.note-date { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+.contact-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+.contact-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--lav-light); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 500; color: var(--lav-dark); flex-shrink: 0; }
+.contact-name { font-size: 14px; font-weight: 500; color: var(--text); }
+.contact-detail { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.contact-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; text-decoration: none; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+/* CONFETTIS */
+.confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; overflow: hidden; }
+.confetto { position: absolute; width: 10px; height: 10px; border-radius: 50%; animation: fall linear forwards; }
+@keyframes fall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* TOAST */
+.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #2C2C2A; color: white; padding: 10px 20px; border-radius: 20px; font-size: 13px; z-index: 999; white-space: nowrap; animation: fadeInOut 2.5s forwards; }
+@keyframes fadeInOut { 0%{opacity:0;transform:translateX(-50%) translateY(10px)} 15%{opacity:1;transform:translateX(-50%) translateY(0)} 75%{opacity:1} 100%{opacity:0} }
+
+/* WINS COUNTER */
+.wins-counter { display: flex; align-items: center; gap: 8px; background: var(--mint-light); border-radius: var(--radius-sm); padding: 8px 14px; margin-bottom: 12px; }
+.wins-number { font-size: 24px; font-weight: 500; color: var(--mint-dark); }
+.wins-label { font-size: 13px; color: var(--mint-dark); }
 </style>
 </head>
 <body>
@@ -115,28 +123,25 @@
       <div class="avatar">🌸</div>
       <div>
         <div class="header-name">Bonjour Phany</div>
-        <div class="header-date" id="dateDisplay">vendredi 27 mars</div>
+        <div class="header-date" id="dateDisplay"></div>
       </div>
     </div>
   </div>
-
   <div class="tabs">
-    <button class="tab active" id="tab-today" onclick="showTab(&#39;today&#39;)">Aujourd'hui</button>
-    <button class="tab" id="tab-tomorrow" onclick="showTab(&#39;tomorrow&#39;)">Demain</button>
-    <button class="tab" id="tab-wins" onclick="showTab(&#39;wins&#39;)">Victoires</button>
-    <button class="tab" id="tab-calendar" onclick="showTab(&#39;calendar&#39;)">Calendrier</button>
-    <button class="tab" id="tab-reminders" onclick="showTab(&#39;reminders&#39;)">Rappels</button>
-    <button class="tab" id="tab-notes" onclick="showTab(&#39;notes&#39;)">Notes</button>
-    <button class="tab" id="tab-contacts" onclick="showTab(&#39;contacts&#39;)">Contacts</button>
+    <button class="tab active" id="tab-today" onclick="showTab('today')">Aujourd'hui</button>
+    <button class="tab" id="tab-tomorrow" onclick="showTab('tomorrow')">Demain</button>
+    <button class="tab" id="tab-wins" onclick="showTab('wins')">Victoires</button>
+    <button class="tab" id="tab-calendar" onclick="showTab('calendar')">Calendrier</button>
+    <button class="tab" id="tab-reminders" onclick="showTab('reminders')">Rappels</button>
+    <button class="tab" id="tab-notes" onclick="showTab('notes')">Notes</button>
+    <button class="tab" id="tab-contacts" onclick="showTab('contacts')">Contacts</button>
   </div>
-
   <div class="content">
 
-    <!-- AUJOURD'HUI -->
     <div class="panel active" id="panel-today">
       <div class="card">
         <div class="card-title">Nouvelle tâche</div>
-        <input type="text" id="taskName" placeholder="Nom de la tâche...">
+        <input type="text" id="taskName" placeholder="Nom de la tâche..." />
         <textarea id="taskSteps" rows="3" placeholder="Étapes à suivre (une par ligne)..."></textarea>
         <div class="btn-row">
           <select id="taskColor" style="flex:1;">
@@ -146,17 +151,16 @@
             <option value="lav">Lavande</option>
             <option value="warm">Doré</option>
           </select>
-          <button class="btn" style="background:var(--rose-light);color:var(--rose-dark);" onclick="addTask(&#39;today&#39;)">Ajouter</button>
+          <button class="btn" style="background:var(--rose-light);color:var(--rose-dark);" onclick="addTask('today')">Ajouter</button>
         </div>
       </div>
-      <div id="today-tasks"><div class="empty-state">Aucune tâche pour le moment.</div></div>
+      <div id="today-tasks"></div>
     </div>
 
-    <!-- DEMAIN -->
     <div class="panel" id="panel-tomorrow">
       <div class="card">
         <div class="card-title">Préparer demain</div>
-        <input type="text" id="tomorrowTask" placeholder="Ce que je veux faire demain...">
+        <input type="text" id="tomorrowTask" placeholder="Ce que je veux faire demain..." />
         <textarea id="tomorrowSteps" rows="3" placeholder="Étapes à suivre (une par ligne)..."></textarea>
         <div class="btn-row">
           <select id="tomorrowColor" style="flex:1;">
@@ -166,23 +170,22 @@
             <option value="peach">Pêche</option>
             <option value="warm">Doré</option>
           </select>
-          <button class="btn" style="background:var(--lav-light);color:var(--lav-dark);" onclick="addTask(&#39;tomorrow&#39;)">Ajouter</button>
+          <button class="btn" style="background:var(--lav-light);color:var(--lav-dark);" onclick="addTask('tomorrow')">Ajouter</button>
         </div>
       </div>
       <div id="tomorrow-tasks"></div>
     </div>
 
-    <!-- VICTOIRES -->
     <div class="panel" id="panel-wins">
       <div class="card">
         <div class="card-title">Note ta victoire</div>
-        <input type="text" id="winText" placeholder="J&#39;ai réussi à...">
+        <input type="text" id="winText" placeholder="J'ai réussi à..." />
         <button class="btn" style="background:var(--mint-light);color:var(--mint-dark);" onclick="addWin()">Enregistrer</button>
       </div>
+      <div id="wins-counter-box"></div>
       <div id="wins-list"></div>
     </div>
 
-    <!-- CALENDRIER -->
     <div class="panel" id="panel-calendar">
       <div class="card">
         <div class="cal-nav">
@@ -200,21 +203,20 @@
       </div>
       <div class="card">
         <div class="card-title">Ajouter un événement</div>
-        <input type="date" id="calEventDate">
-        <input type="text" id="calEventText" placeholder="Description...">
+        <input type="date" id="calEventDate" />
+        <input type="text" id="calEventText" placeholder="Description..." />
         <button class="btn" style="background:var(--peach-light);color:var(--peach-dark);" onclick="addCalEvent()">Ajouter</button>
       </div>
       <div id="cal-events-list"></div>
     </div>
 
-    <!-- RAPPELS -->
     <div class="panel" id="panel-reminders">
       <div class="card">
         <div class="card-title">Nouveau rappel</div>
-        <input type="text" id="reminderText" placeholder="Me rappeler de...">
+        <input type="text" id="reminderText" placeholder="Me rappeler de..." />
         <div class="two-col">
-          <input type="date" id="reminderDate1">
-          <input type="time" id="reminderTime1">
+          <input type="date" id="reminderDate1" />
+          <input type="time" id="reminderTime1" />
         </div>
         <div id="extra-slots"></div>
         <button class="add-slot-btn" onclick="addSlot()">+ Ajouter un autre horaire</button>
@@ -225,24 +227,22 @@
       <div id="reminders-list"></div>
     </div>
 
-    <!-- NOTES -->
     <div class="panel" id="panel-notes">
       <div class="card">
         <div class="card-title">Nouvelle note</div>
-        <input type="text" id="noteTitle" placeholder="Titre...">
+        <input type="text" id="noteTitle" placeholder="Titre..." />
         <textarea id="noteBody" rows="4" placeholder="Écris ta note ici..."></textarea>
         <button class="btn" style="background:var(--blue-light);color:var(--blue-dark);" onclick="addNote()">Enregistrer</button>
       </div>
       <div id="notes-list"></div>
     </div>
 
-    <!-- CONTACTS -->
     <div class="panel" id="panel-contacts">
       <div class="card">
         <div class="card-title">Nouveau contact</div>
-        <input type="text" id="contactName" placeholder="Prénom et nom...">
-        <input type="tel" id="contactPhone" placeholder="Numéro de téléphone...">
-        <input type="text" id="contactNote" placeholder="Note (ex: médecin, amie...)">
+        <input type="text" id="contactName" placeholder="Prénom et nom..." />
+        <input type="tel" id="contactPhone" placeholder="Numéro de téléphone..." />
+        <input type="text" id="contactNote" placeholder="Note (ex: médecin, amie...)" />
         <button class="btn" style="background:var(--lav-light);color:var(--lav-dark);" onclick="addContact()">Ajouter</button>
       </div>
       <div id="contacts-list"></div>
@@ -261,10 +261,11 @@ const colorMap = {
 };
 const tabColors = { today:'rose', tomorrow:'lav', wins:'mint', calendar:'peach', reminders:'warm', notes:'blue', contacts:'lav' };
 const tabColorMap = { rose:['#FBEAF0','#72243E'], lav:['#EEEDFE','#3C3489'], mint:['#E1F5EE','#085041'], peach:['#FAECE7','#712B13'], warm:['#FAEEDA','#633806'], blue:['#E6F1FB','#0C447C'] };
+const confettiColors = ['#ED93B1','#5DCAA5','#AFA9EC','#F0997B','#EF9F27','#72243E','#085041'];
 
-const KEY = 'phany_app_v3';
+const KEY = 'phany_app_v4';
 let data = { today:[], tomorrow:[], wins:[], calEvents:[], reminders:[], notes:[], contacts:[] };
-let slotCount = 1;
+let slotIndex = 1;
 
 function load() { try { const s = localStorage.getItem(KEY); if (s) { const d = JSON.parse(s); data = {...data, ...d}; } } catch(e) {} }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e) {} }
@@ -275,10 +276,30 @@ let calYear = now.getFullYear(), calMonth_ = now.getMonth();
 const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 document.getElementById('dateDisplay').textContent = now.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
 
-// Set default date for reminder
 const todayStr = now.toISOString().split('T')[0];
 document.getElementById('reminderDate1').value = todayStr;
 document.getElementById('calEventDate').value = todayStr;
+
+// CONFETTIS 🎉
+function launchConfetti() {
+  const container = document.createElement('div');
+  container.className = 'confetti-container';
+  document.body.appendChild(container);
+  for (let i = 0; i < 60; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetto';
+    c.style.left = Math.random() * 100 + '%';
+    c.style.top = '-10px';
+    c.style.background = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+    c.style.width = (6 + Math.random() * 8) + 'px';
+    c.style.height = (6 + Math.random() * 8) + 'px';
+    c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    c.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+    c.style.animationDelay = (Math.random() * 0.5) + 's';
+    container.appendChild(c);
+  }
+  setTimeout(() => container.remove(), 3500);
+}
 
 function showTab(tab) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -298,7 +319,14 @@ function showTab(tab) {
   if (tab==='contacts') renderContacts();
 }
 
-// TASKS
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
 function addTask(list) {
   const nameId = list==='today' ? 'taskName' : 'tomorrowTask';
   const stepsId = list==='today' ? 'taskSteps' : 'tomorrowSteps';
@@ -324,9 +352,9 @@ function renderTasks(list) {
         <span class="step-text ${s.done?'done':''}">${s.text}</span>
       </div>`).join('')}</div>` : '';
     const moveBtn = list==='today'
-      ? `<button class="move-btn" onclick="moveToTomorrow(${i})" title="Reporter à demain">→ Demain</button>`
-      : `<button class="move-btn" onclick="moveToToday(${i})" title="Avancer à aujourd'hui">→ Aujourd'hui</button>`;
-    return `<div class="task-card" style="background:${c.bg};border:1px solid ${c.border};">
+      ? `<button class="move-btn" onclick="moveToTomorrow(${i})">→ Demain</button>`
+      : `<button class="move-btn" onclick="moveToToday(${i})">→ Aujourd'hui</button>`;
+    return `<div class="task-card" id="taskcard-${list}-${i}" style="background:${c.bg};border:1px solid ${c.border};">
       <div class="task-header">
         <div class="task-left">
           <input type="checkbox" class="check" ${task.done?'checked':''} onchange="toggleTask('${list}',${i})" />
@@ -346,47 +374,49 @@ function toggleTask(list, i) {
   data[list][i].done = !data[list][i].done;
   if (data[list][i].done) {
     data.wins.unshift({ text: data[list][i].name, date: now.toLocaleDateString('fr-FR'), auto: true });
+    launchConfetti();
+    showToast('🌟 Bravo Phany, tâche accomplie !');
   } else {
     data.wins = data.wins.filter(w => !(w.auto && w.text === data[list][i].name));
   }
   save(); renderTasks(list);
 }
-function toggleStep(list,ti,si) { data[list][ti].steps[si].done=!data[list][ti].steps[si].done; save(); renderTasks(list); }
+
+function toggleStep(list,ti,si) {
+  data[list][ti].steps[si].done = !data[list][ti].steps[si].done;
+  if (data[list][ti].steps[si].done) {
+    launchConfetti();
+    showToast('✨ Étape accomplie !');
+  }
+  save(); renderTasks(list);
+}
+
 function deleteTask(list,i) { data[list].splice(i,1); save(); renderTasks(list); }
 
 function moveToTomorrow(i) {
-  const task = data.today.splice(i,1)[0];
-  task.done = false;
-  data.tomorrow.push(task);
-  save(); renderTasks('today');
+  const task = data.today.splice(i,1)[0]; task.done = false;
+  data.tomorrow.push(task); save(); renderTasks('today');
   showToast('Tâche reportée à demain 👍');
 }
 function moveToToday(i) {
-  const task = data.tomorrow.splice(i,1)[0];
-  task.done = false;
-  data.today.push(task);
-  save(); renderTasks('tomorrow');
+  const task = data.tomorrow.splice(i,1)[0]; task.done = false;
+  data.today.push(task); save(); renderTasks('tomorrow');
   showToast('Tâche avancée à aujourd\'hui 👍');
 }
 
-function showToast(msg) {
-  const t = document.createElement('div');
-  t.textContent = msg;
-  t.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#2C2C2A;color:white;padding:10px 20px;border-radius:20px;font-size:13px;z-index:999;white-space:nowrap;';
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(), 2500);
-}
-
-// WINS
 function addWin() {
   const el = document.getElementById('winText');
   const text = el.value.trim();
   if (!text) return;
   data.wins.unshift({ text, date: now.toLocaleDateString('fr-FR'), auto: false });
   el.value=''; save(); renderWins();
+  launchConfetti();
 }
+
 function renderWins() {
+  const counter = document.getElementById('wins-counter-box');
   const el = document.getElementById('wins-list');
+  counter.innerHTML = data.wins.length ? `<div class="wins-counter"><div class="wins-number">🌟 ${data.wins.length}</div><div class="wins-label">victoire${data.wins.length > 1 ? 's' : ''} au total !</div></div>` : '';
   if (!data.wins.length) { el.innerHTML='<div class="empty-state">Tes victoires apparaîtront ici.<br>Chaque chose accomplie compte !</div>'; return; }
   el.innerHTML = data.wins.map((w,i)=>`
     <div class="win-card">
@@ -400,19 +430,17 @@ function renderWins() {
 }
 function deleteWin(i) { data.wins.splice(i,1); save(); renderWins(); }
 
-// CALENDAR
 function renderCalendar() {
   document.getElementById('calMonth').textContent = months[calMonth_]+' '+calYear;
   const grid = document.getElementById('calGrid');
   const first = new Date(calYear, calMonth_, 1);
   let startDay = first.getDay(); startDay = startDay===0?6:startDay-1;
   const daysInMonth = new Date(calYear, calMonth_+1, 0).getDate();
-  const todayFull = now.toISOString().split('T')[0];
   let html='';
   for(let i=0;i<startDay;i++) html+='<div></div>';
   for(let d=1;d<=daysInMonth;d++) {
     const ds = calYear+'-'+String(calMonth_+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-    const isToday = ds===todayFull;
+    const isToday = ds===todayStr;
     const hasEvent = data.calEvents.some(e=>e.date===ds);
     html+=`<div class="cal-cell ${isToday?'today':''} ${hasEvent?'has-event':''}" onclick="selectDate('${ds}')">${d}</div>`;
   }
@@ -434,31 +462,26 @@ function renderCalEvents() {
   const sorted=[...data.calEvents].sort((a,b)=>a.date.localeCompare(b.date));
   el.innerHTML='<div class="section-label">Tous les événements</div>'+sorted.map((e,i)=>`
     <div class="event-item">
-      <div>
-        <div class="event-text">${e.text}</div>
-        <div class="event-date">${new Date(e.date+'T12:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'long'})}</div>
-      </div>
+      <div><div class="event-text">${e.text}</div>
+      <div class="event-date">${new Date(e.date+'T12:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'long'})}</div></div>
       <button class="icon-btn" style="color:var(--peach-dark)" onclick="deleteCalEvent(${data.calEvents.indexOf(e)})">×</button>
     </div>`).join('');
 }
 function deleteCalEvent(i) { data.calEvents.splice(i,1); save(); renderCalendar(); }
 
-// REMINDERS
-let slotIndex = 1;
+let slotIdx = 1;
 function addSlot() {
-  slotIndex++;
+  slotIdx++;
   const div = document.createElement('div');
-  div.className = 'two-col'; div.id = 'slot-'+slotIndex;
-  div.style.marginBottom = '8px';
-  div.innerHTML = `<input type="date" id="reminderDate${slotIndex}" value="${todayStr}" /><input type="time" id="reminderTime${slotIndex}" />`;
+  div.className = 'two-col'; div.style.marginBottom = '8px';
+  div.innerHTML = `<input type="date" id="reminderDate${slotIdx}" value="${todayStr}" /><input type="time" id="reminderTime${slotIdx}" />`;
   document.getElementById('extra-slots').appendChild(div);
 }
-
 function addReminder() {
   const text = document.getElementById('reminderText').value.trim();
   if (!text) return;
   const slots = [];
-  for(let i=1;i<=slotIndex;i++) {
+  for(let i=1;i<=slotIdx;i++) {
     const d = document.getElementById('reminderDate'+i);
     const t = document.getElementById('reminderTime'+i);
     if(d&&t&&d.value&&t.value) slots.push({date:d.value, time:t.value});
@@ -469,43 +492,35 @@ function addReminder() {
   document.getElementById('reminderDate1').value=todayStr;
   document.getElementById('reminderTime1').value='';
   document.getElementById('extra-slots').innerHTML='';
-  slotIndex=1;
+  slotIdx=1;
   save(); renderReminders();
   slots.forEach(s => scheduleOne(text, s.date, s.time));
 }
-
 function scheduleOne(text, date, time) {
-  const status = document.getElementById('notif-status');
-  if(!('Notification' in window)) { status.textContent='Notifications non supportées.'; return; }
+  if(!('Notification' in window)) return;
   Notification.requestPermission().then(p => {
     if(p==='granted') {
       const target = new Date(date+'T'+time+':00');
       const diff = target - Date.now();
-      if(diff>0) {
-        setTimeout(()=>new Notification('Rappel 🌸',{body:text}), diff);
-        status.textContent='Rappel(s) programmé(s) !';
-      } else { status.textContent='Une des heures est déjà passée.'; }
-    } else { status.textContent='Autorise les notifications dans Safari.'; }
+      if(diff>0) setTimeout(()=>new Notification('Rappel 🌸',{body:text}), diff);
+      document.getElementById('notif-status').textContent = 'Rappel programmé !';
+    }
   });
 }
-
 function renderReminders() {
   const el=document.getElementById('reminders-list');
   if(!data.reminders.length){el.innerHTML='<div class="empty-state">Aucun rappel programmé.</div>';return;}
   el.innerHTML=data.reminders.map((r,i)=>`
     <div class="reminder-card">
-      <div class="reminder-header">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
         <div class="reminder-title">${r.text}</div>
         <button class="icon-btn" style="color:var(--warm-dark)" onclick="deleteReminder(${i})">×</button>
       </div>
-      <div class="reminder-slots">
-        ${r.slots.map(s=>`<div class="reminder-slot"><span class="reminder-slot-text">${new Date(s.date+'T12:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'})} à ${s.time}</span></div>`).join('')}
-      </div>
+      ${r.slots.map(s=>`<div class="reminder-slot"><span class="reminder-slot-text">${new Date(s.date+'T12:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'})} à ${s.time}</span></div>`).join('')}
     </div>`).join('');
 }
 function deleteReminder(i) { data.reminders.splice(i,1); save(); renderReminders(); }
 
-// NOTES
 function addNote() {
   const title = document.getElementById('noteTitle').value.trim();
   const body = document.getElementById('noteBody').value.trim();
@@ -532,7 +547,6 @@ function renderNotes() {
 }
 function deleteNote(i) { data.notes.splice(i,1); save(); renderNotes(); }
 
-// CONTACTS
 function addContact() {
   const name=document.getElementById('contactName').value.trim();
   const phone=document.getElementById('contactPhone').value.trim();
@@ -552,15 +566,15 @@ function renderContacts() {
     const initials=c.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
     return `<div class="contact-card">
       <div class="contact-avatar">${initials}</div>
-      <div class="contact-info">
+      <div style="flex:1;">
         <div class="contact-name">${c.name}</div>
         ${c.phone?`<div class="contact-detail">${c.phone}</div>`:''}
         ${c.note?`<div class="contact-detail" style="font-style:italic;">${c.note}</div>`:''}
       </div>
-      <div class="contact-actions">
-        ${c.phone?`<a href="tel:${c.phone}" class="contact-btn" title="Appeler">📞</a>`:''}
-        ${c.phone?`<a href="sms:${c.phone}" class="contact-btn" title="SMS">💬</a>`:''}
-        <button class="contact-btn" onclick="deleteContact(${data.contacts.indexOf(c)})" title="Supprimer">×</button>
+      <div style="display:flex;gap:6px;">
+        ${c.phone?`<a href="tel:${c.phone}" class="contact-btn">📞</a>`:''}
+        ${c.phone?`<a href="sms:${c.phone}" class="contact-btn">💬</a>`:''}
+        <button class="contact-btn" onclick="deleteContact(${data.contacts.indexOf(c)})">×</button>
       </div>
     </div>`;
   }).join('');
@@ -569,6 +583,5 @@ function deleteContact(i) { data.contacts.splice(i,1); save(); renderContacts();
 
 renderTasks('today');
 </script>
-
-
-</body></html>
+</body>
+</html>
