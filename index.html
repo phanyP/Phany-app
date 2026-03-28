@@ -215,8 +215,7 @@ textarea { resize: none; line-height: 1.6; }
     <button class="tab" id="tab-tomorrow" onclick="showTab('tomorrow')">Demain</button>
     <button class="tab" id="tab-wins" onclick="showTab('wins')">Victoires</button>
     <button class="tab" id="tab-pomodoro" onclick="showTab('pomodoro')">⏱ Focus</button>
-    <button class="tab" id="tab-calendar" onclick="showTab('calendar')">Calendrier</button>
-    <button class="tab" id="tab-reminders" onclick="showTab('reminders')">Rappels</button>
+    <button class="tab" id="tab-agenda" onclick="showTab('agenda')">📅 Agenda</button>
     <button class="tab" id="tab-notes" onclick="showTab('notes')">Notes</button>
     <button class="tab" id="tab-contacts" onclick="showTab('contacts')">Contacts</button>
     <button class="tab" id="tab-recurring" onclick="showTab('recurring')">🔄 Récurrentes</button>
@@ -322,7 +321,8 @@ textarea { resize: none; line-height: 1.6; }
       </div>
     </div>
 
-    <div class="panel" id="panel-calendar">
+    <!-- AGENDA UNIFIÉ -->
+    <div class="panel" id="panel-agenda">
       <div class="card">
         <div class="cal-nav">
           <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
@@ -337,30 +337,21 @@ textarea { resize: none; line-height: 1.6; }
         </div>
         <div class="cal-grid" id="calGrid"></div>
       </div>
-      <div class="card">
-        <div class="card-title">Ajouter un événement</div>
-        <input type="date" id="calEventDate" />
-        <input type="text" id="calEventText" placeholder="Description..." />
-        <button class="btn" style="background:var(--peach-light);color:var(--peach-dark);" onclick="addCalEvent()">Ajouter</button>
-      </div>
-      <div id="cal-events-list"></div>
-    </div>
 
-    <div class="panel" id="panel-reminders">
       <div class="card">
-        <div class="card-title">Nouveau rappel</div>
-        <input type="text" id="reminderText" placeholder="Me rappeler de..." />
+        <div class="card-title">Ajouter un événement ou rappel</div>
+        <input type="text" id="agendaText" placeholder="Description..." />
         <div class="two-col">
-          <input type="date" id="reminderDate1" />
-          <input type="time" id="reminderTime1" />
+          <input type="date" id="agendaDate" />
+          <input type="time" id="agendaTime1" placeholder="Heure (optionnel)" />
         </div>
-        <div id="extra-slots"></div>
-        <button class="add-slot-btn" onclick="addSlot()">+ Ajouter un autre horaire</button>
+        <div id="agenda-extra-slots"></div>
+        <button class="add-slot-btn" onclick="addAgendaSlot()">+ Ajouter un autre horaire de rappel</button>
         <div style="height:8px;"></div>
-        <button class="btn" style="background:var(--warm-light);color:var(--warm-dark);width:100%;" onclick="addReminder()">Programmer</button>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:6px;" id="notif-status"></div>
+        <button class="btn" style="background:var(--peach-light);color:var(--peach-dark);width:100%;" onclick="addAgendaItem()">Ajouter</button>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:6px;" id="agenda-notif-status"></div>
       </div>
-      <div id="reminders-list"></div>
+      <div id="agenda-events-list"></div>
     </div>
 
     <div class="panel" id="panel-notes">
@@ -554,7 +545,7 @@ const colorMap = {
   lav:   { bg: '#EEEDFE', dark: '#3C3489', border: '#AFA9EC33' },
   warm:  { bg: '#FAEEDA', dark: '#633806', border: '#EF9F2733' }
 };
-const tabColors = { today:'rose', tomorrow:'lav', wins:'mint', pomodoro:'rose', calendar:'peach', reminders:'warm', notes:'blue', contacts:'lav', recurring:'rose', week:'peach', settings:'lav', shopping:'mint', meds:'lav' };
+const tabColors = { today:'rose', tomorrow:'lav', wins:'mint', pomodoro:'rose', agenda:'peach', notes:'blue', contacts:'lav', recurring:'rose', week:'peach', settings:'lav', shopping:'mint', meds:'lav' };
 const tabColorMap = { rose:['#FBEAF0','#72243E'], lav:['#EEEDFE','#3C3489'], mint:['#E1F5EE','#085041'], peach:['#FAECE7','#712B13'], warm:['#FAEEDA','#633806'], blue:['#E6F1FB','#0C447C'] };
 const confettiColors = ['#ED93B1','#5DCAA5','#AFA9EC','#F0997B','#EF9F27','#72243E','#085041'];
 
@@ -733,7 +724,7 @@ function showTab(tab) {
   const col = tabColors[tab];
   const [bg, dark] = tabColorMap[col];
   btn.style.background = bg; btn.style.color = dark; btn.style.borderColor = dark+'55';
-  if(tab==='calendar') renderCalendar();
+  if(tab==='agenda') renderAgenda();
   if(tab==='wins') renderWins();
   if(tab==='reminders') renderReminders();
   if(tab==='today') renderTasks('today');
@@ -1039,6 +1030,15 @@ function renderWins(){
 }
 function deleteWin(i){data.wins.splice(i,1);save();renderWins();}
 
+// AGENDA UNIFIÉ
+let agendaSlotIdx = 1;
+
+function renderAgenda() {
+  document.getElementById('agendaDate').value = todayStr;
+  renderCalendar();
+  renderAgendaList();
+}
+
 function renderCalendar(){
   document.getElementById('calMonth').textContent=months[calMonth_]+' '+calYear;
   const grid=document.getElementById('calGrid');
@@ -1050,60 +1050,57 @@ function renderCalendar(){
   for(let d=1;d<=daysInMonth;d++){
     const ds=calYear+'-'+String(calMonth_+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     const isToday=ds===todayStr;
-    const hasEvent=data.calEvents.some(e=>e.date===ds);
+    const hasEvent=data.calEvents.some(e=>e.date===ds) || data.reminders.some(r=>r.slots&&r.slots.some(s=>s.date===ds));
     html+=`<div class="cal-cell ${isToday?'today':''} ${hasEvent?'has-event':''}" onclick="selectDate('${ds}')">${d}</div>`;
   }
-  grid.innerHTML=html;renderCalEvents();
+  grid.innerHTML=html;
 }
-function changeMonth(dir){calMonth_+=dir;if(calMonth_<0){calMonth_=11;calYear--;}if(calMonth_>11){calMonth_=0;calYear++;}renderCalendar();}
-function selectDate(date){document.getElementById('calEventDate').value=date;}
-function addCalEvent(){
-  const date=document.getElementById('calEventDate').value;
-  const text=document.getElementById('calEventText').value.trim();
-  if(!date||!text) return;
-  data.calEvents.push({date,text});
-  document.getElementById('calEventText').value='';
-  save();renderCalendar();
-}
-function renderCalEvents(){
-  const el=document.getElementById('cal-events-list');
-  if(!data.calEvents.length){el.innerHTML='';return;}
-  const sorted=[...data.calEvents].sort((a,b)=>a.date.localeCompare(b.date));
-  el.innerHTML='<div class="section-label">Tous les événements</div>'+sorted.map((e,i)=>`
-    <div class="event-item">
-      <div><div class="event-text">${e.text}</div>
-      <div class="event-date">${new Date(e.date+'T12:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'long'})}</div></div>
-      <button class="icon-btn" style="color:var(--peach-dark)" onclick="deleteCalEvent(${data.calEvents.indexOf(e)})">×</button>
-    </div>`).join('');
-}
-function deleteCalEvent(i){data.calEvents.splice(i,1);save();renderCalendar();}
 
-function addSlot(){
-  slotIdx++;
+function changeMonth(dir){calMonth_+=dir;if(calMonth_<0){calMonth_=11;calYear--;}if(calMonth_>11){calMonth_=0;calYear++;}renderCalendar();}
+
+function selectDate(date){
+  document.getElementById('agendaDate').value=date;
+  document.getElementById('agendaTime1').value='';
+}
+
+function addAgendaSlot(){
+  agendaSlotIdx++;
   const div=document.createElement('div');
   div.className='two-col';div.style.marginBottom='8px';
-  div.innerHTML=`<input type="date" id="reminderDate${slotIdx}" value="${todayStr}" /><input type="time" id="reminderTime${slotIdx}" />`;
-  document.getElementById('extra-slots').appendChild(div);
+  div.innerHTML=`<input type="date" id="agendaDate${agendaSlotIdx}" value="${todayStr}" /><input type="time" id="agendaTime${agendaSlotIdx}" />`;
+  document.getElementById('agenda-extra-slots').appendChild(div);
 }
-function addReminder(){
-  const text=document.getElementById('reminderText').value.trim();
-  if(!text) return;
+
+function addAgendaItem(){
+  const text=document.getElementById('agendaText').value.trim();
+  const date=document.getElementById('agendaDate').value;
+  if(!text||!date) return;
+
   const slots=[];
-  for(let i=1;i<=slotIdx;i++){
-    const d=document.getElementById('reminderDate'+i);
-    const t=document.getElementById('reminderTime'+i);
-    if(d&&t&&d.value&&t.value) slots.push({date:d.value,time:t.value});
+  for(let i=1;i<=agendaSlotIdx;i++){
+    const dateEl=document.getElementById('agendaDate'+(i===1?'':i));
+    const timeEl=document.getElementById('agendaTime'+i);
+    const d=i===1?date:(dateEl?dateEl.value:date);
+    const t=timeEl?timeEl.value:'';
+    if(t) slots.push({date:d,time:t});
   }
-  if(!slots.length){document.getElementById('notif-status').textContent='Ajoute au moins une date et heure.';return;}
-  data.reminders.push({id:Date.now(),text,slots});
-  document.getElementById('reminderText').value='';
-  document.getElementById('reminderDate1').value=todayStr;
-  document.getElementById('reminderTime1').value='';
-  document.getElementById('extra-slots').innerHTML='';
-  slotIdx=1;
-  save();renderReminders();
-  slots.forEach(s=>scheduleOne(text,s.date,s.time));
+
+  if(slots.length>0){
+    data.reminders.push({id:Date.now(),text,slots});
+    slots.forEach(s=>scheduleOne(text,s.date,s.time));
+  } else {
+    data.calEvents.push({date,text});
+  }
+
+  document.getElementById('agendaText').value='';
+  document.getElementById('agendaDate').value=todayStr;
+  document.getElementById('agendaTime1').value='';
+  document.getElementById('agenda-extra-slots').innerHTML='';
+  agendaSlotIdx=1;
+  save();renderCalendar();renderAgendaList();
+  showToast('Ajouté à l\'agenda ! 📅');
 }
+
 function scheduleOne(text,date,time){
   if(!('Notification' in window)) return;
   Notification.requestPermission().then(p=>{
@@ -1111,23 +1108,45 @@ function scheduleOne(text,date,time){
       const target=new Date(date+'T'+time+':00');
       const diff=target-Date.now();
       if(diff>0) setTimeout(()=>new Notification('Rappel 🌸',{body:text}),diff);
-      document.getElementById('notif-status').textContent='Rappel programmé !';
+      document.getElementById('agenda-notif-status').textContent='Rappel(s) programmé(s) !';
     }
   });
 }
-function renderReminders(){
-  const el=document.getElementById('reminders-list');
-  if(!data.reminders.length){el.innerHTML='<div class="empty-state">Aucun rappel programmé.</div>';return;}
-  el.innerHTML=data.reminders.map((r,i)=>`
-    <div class="reminder-card">
+
+function renderAgendaList(){
+  const el=document.getElementById('agenda-events-list');
+  let html='';
+
+  const allItems=[];
+  data.calEvents.forEach((e,i)=>allItems.push({type:'event',date:e.date,text:e.text,idx:i}));
+  data.reminders.forEach((r,i)=>{
+    if(r.slots&&r.slots.length){
+      r.slots.forEach(s=>allItems.push({type:'reminder',date:s.date,time:s.time,text:r.text,idx:i}));
+    }
+  });
+  allItems.sort((a,b)=>a.date.localeCompare(b.date)||(a.time||'').localeCompare(b.time||''));
+
+  if(!allItems.length){el.innerHTML='<div class="empty-state">Aucun événement ou rappel 📅</div>';return;}
+
+  html='<div class="section-label">Tous les événements et rappels</div>';
+  allItems.forEach(item=>{
+    const dateLabel=new Date(item.date+'T12:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'long'});
+    const isReminder=item.type==='reminder';
+    html+=`<div class="${isReminder?'reminder-card':'event-item'}" style="margin-bottom:8px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-        <div class="reminder-title">${r.text}</div>
-        <button class="icon-btn" style="color:var(--warm-dark)" onclick="deleteReminder(${i})">×</button>
+        <div>
+          <div style="font-size:14px;color:${isReminder?'var(--warm-dark)':'var(--peach-dark)'};">${isReminder?'🔔':'📅'} ${item.text}</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${dateLabel}${item.time?' à '+item.time:''}</div>
+        </div>
+        <button class="icon-btn" onclick="${isReminder?'deleteReminder('+item.idx+')':'deleteCalEvent('+item.idx+')'}" style="color:${isReminder?'var(--warm-dark)':'var(--peach-dark)'};">×</button>
       </div>
-      ${r.slots.map(s=>`<div class="reminder-slot"><span class="reminder-slot-text">${new Date(s.date+'T12:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'})} à ${s.time}</span></div>`).join('')}
-    </div>`).join('');
+    </div>`;
+  });
+  el.innerHTML=html;
 }
-function deleteReminder(i){data.reminders.splice(i,1);save();renderReminders();}
+
+function deleteCalEvent(i){data.calEvents.splice(i,1);save();renderCalendar();renderAgendaList();}
+function deleteReminder(i){data.reminders.splice(i,1);save();renderCalendar();renderAgendaList();}
 
 // NOTES & DOSSIERS
 let currentFolderEmoji = '📁';
