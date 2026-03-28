@@ -1144,8 +1144,8 @@ function renderAgenda() {
     renderAgenda();
   });
 
-  renderCalendar();
-  renderAgendaList();
+  // Attendre que le DOM soit prêt avant de remplir le calendrier
+  setTimeout(() => { renderCalendar(); renderAgendaList(); }, 50);
 }
 
 function renderCalendar(){
