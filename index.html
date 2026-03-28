@@ -147,6 +147,27 @@ textarea { resize: none; line-height: 1.6; }
 .folder-colors { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
 .folder-color-opt { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; }
 .folder-color-opt.active { border-color: var(--text); }
+
+/* LISTE DE COURSES */
+.shop-category { font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 14px 0 8px; }
+.shop-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 6px; }
+.shop-item.checked { opacity: 0.5; }
+.shop-name { font-size: 14px; flex: 1; }
+.shop-name.done { text-decoration: line-through; }
+.shop-qty { font-size: 12px; color: var(--text-muted); }
+
+/* MÉDICAMENTS */
+.med-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; }
+.med-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.med-name { font-size: 15px; font-weight: 500; color: var(--text); }
+.med-doses { display: flex; flex-wrap: wrap; gap: 6px; }
+.med-dose-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; color: var(--text-muted); }
+.med-dose-btn.taken { background: var(--mint-light); color: var(--mint-dark); border-color: var(--mint-mid); font-weight: 500; }
+
+/* CITATION */
+.citation-card { background: var(--rose-light); border-radius: var(--radius); padding: 20px; margin-bottom: 12px; text-align: center; border: 1px solid var(--rose-mid)44; }
+.citation-text { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--rose-dark); line-height: 1.5; margin-bottom: 8px; }
+.citation-author { font-size: 12px; color: var(--text-muted); }
 .confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; overflow: hidden; }
 .confetto { position: absolute; animation: fall linear forwards; }
 @keyframes fall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
@@ -201,6 +222,8 @@ textarea { resize: none; line-height: 1.6; }
     <button class="tab" id="tab-recurring" onclick="showTab('recurring')">🔄 Récurrentes</button>
     <button class="tab" id="tab-week" onclick="showTab('week')">📅 Semaine</button>
     <button class="tab" id="tab-settings" onclick="showTab('settings')">⚙️ Paramètres</button>
+    <button class="tab" id="tab-shopping" onclick="showTab('shopping')">🛒 Courses</button>
+    <button class="tab" id="tab-meds" onclick="showTab('meds')">💊 Médicaments</button>
   </div>
   <div class="content">
 
@@ -464,6 +487,51 @@ textarea { resize: none; line-height: 1.6; }
       </div>
     </div>
 
+    <!-- LISTE DE COURSES -->
+    <div class="panel" id="panel-shopping">
+      <div id="citation-box"></div>
+      <div class="card">
+        <div class="card-title">Ajouter un article</div>
+        <input type="text" id="shopItem" placeholder="Nom de l'article..." />
+        <div class="btn-row">
+          <input type="text" id="shopQty" placeholder="Quantité..." style="flex:1;" />
+          <select id="shopCat" style="flex:1;">
+            <option value="🥦 Légumes">🥦 Légumes</option>
+            <option value="🥛 Frigo">🥛 Frigo</option>
+            <option value="🍞 Boulangerie">🍞 Boulangerie</option>
+            <option value="🥫 Épicerie">🥫 Épicerie</option>
+            <option value="🧴 Hygiène">🧴 Hygiène</option>
+            <option value="🍬 Autres">🍬 Autres</option>
+          </select>
+        </div>
+        <div class="btn-row">
+          <button class="btn" style="background:var(--mint-light);color:var(--mint-dark);flex:1;" onclick="addShopItem()">Ajouter</button>
+          <button class="btn" style="background:var(--peach-light);color:var(--peach-dark);" onclick="clearCheckedItems()">Effacer cochés</button>
+        </div>
+      </div>
+      <div id="shopping-list"></div>
+    </div>
+
+    <!-- MÉDICAMENTS -->
+    <div class="panel" id="panel-meds">
+      <div class="card">
+        <div class="card-title">Ajouter un médicament</div>
+        <input type="text" id="medName" placeholder="Nom du médicament..." />
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Horaires de prise :</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;"><input type="checkbox" id="medMatin"> Matin</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;"><input type="checkbox" id="medMidi"> Midi</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;"><input type="checkbox" id="medSoir"> Soir</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;"><input type="checkbox" id="medNuit"> Nuit</label>
+        </div>
+        <button class="btn" style="background:var(--lav-light);color:var(--lav-dark);width:100%;" onclick="addMed()">Ajouter</button>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);background:var(--mint-light);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px;line-height:1.6;">
+        Coche chaque prise au fur et à mesure. Les cases se remettent à zéro chaque jour 🌸
+      </div>
+      <div id="meds-list"></div>
+    </div>
+
     <div class="panel" id="panel-contacts">
       <div class="card">
         <div class="card-title">Nouveau contact</div>
@@ -486,12 +554,12 @@ const colorMap = {
   lav:   { bg: '#EEEDFE', dark: '#3C3489', border: '#AFA9EC33' },
   warm:  { bg: '#FAEEDA', dark: '#633806', border: '#EF9F2733' }
 };
-const tabColors = { today:'rose', tomorrow:'lav', wins:'mint', pomodoro:'rose', calendar:'peach', reminders:'warm', notes:'blue', contacts:'lav', recurring:'rose', week:'peach', settings:'lav' };
+const tabColors = { today:'rose', tomorrow:'lav', wins:'mint', pomodoro:'rose', calendar:'peach', reminders:'warm', notes:'blue', contacts:'lav', recurring:'rose', week:'peach', settings:'lav', shopping:'mint', meds:'lav' };
 const tabColorMap = { rose:['#FBEAF0','#72243E'], lav:['#EEEDFE','#3C3489'], mint:['#E1F5EE','#085041'], peach:['#FAECE7','#712B13'], warm:['#FAEEDA','#633806'], blue:['#E6F1FB','#0C447C'] };
 const confettiColors = ['#ED93B1','#5DCAA5','#AFA9EC','#F0997B','#EF9F27','#72243E','#085041'];
 
 const KEY = 'phany_app_v5';
-let data = { today:[], tomorrow:[], wins:[], calEvents:[], reminders:[], notes:[], contacts:[], recurring:[], settings:{ name:'Phany', emoji:'🌸', themeColor:'#ED93B1', themeLight:'#FBEAF0', themeDark:'#72243E' }, folders:[] };
+let data = { today:[], tomorrow:[], wins:[], calEvents:[], reminders:[], notes:[], contacts:[], recurring:[], settings:{ name:'Phany', emoji:'🌸', themeColor:'#ED93B1', themeLight:'#FBEAF0', themeDark:'#72243E' }, folders:[], shopping:[], meds:[], medsLog:{} };
 let slotIdx = 1;
 
 function load() { try { const s = localStorage.getItem(KEY); if (s) { const d = JSON.parse(s); data = {...data, ...d}; } } catch(e) {} }
@@ -675,6 +743,8 @@ function showTab(tab) {
   if(tab==='recurring') renderRecurring();
   if(tab==='week') renderWeek();
   if(tab==='settings') initSettings();
+  if(tab==='shopping') renderShopping();
+  if(tab==='meds') renderMeds();
 }
 
 function addTask(list) {
@@ -1184,6 +1254,136 @@ function renderContacts(){
     </div>`;
   }).join('');
 }
+// CITATIONS MOTIVANTES
+const citations = [
+  { text: "Tu n'as pas à être parfaite pour être incroyable.", author: "" },
+  { text: "Chaque petit pas compte. Tu avances, c'est ce qui importe.", author: "" },
+  { text: "Le courage n'est pas l'absence de peur, c'est d'agir malgré elle.", author: "Nelson Mandela" },
+  { text: "Prends soin de toi comme tu prendrais soin de quelqu'un que tu aimes.", author: "" },
+  { text: "Ton cerveau fonctionne différemment, pas moins bien.", author: "" },
+  { text: "Une tâche à la fois. Un souffle à la fois. Un moment à la fois.", author: "" },
+  { text: "Tu as déjà surmonté des choses qui te semblaient impossibles.", author: "" },
+  { text: "La progression, pas la perfection.", author: "" },
+  { text: "Tu es plus forte que tu ne le crois.", author: "" },
+  { text: "Chaque jour est une nouvelle chance de recommencer.", author: "" },
+  { text: "Tes efforts d'aujourd'hui sont les victoires de demain.", author: "" },
+  { text: "Il n'y a pas de petite victoire. Toutes comptent.", author: "" },
+  { text: "Sois douce avec toi-même. Tu fais de ton mieux.", author: "" },
+  { text: "Le désordre dans la tête n'empêche pas la clarté dans le cœur.", author: "" },
+  { text: "Tu n'as pas à tout faire aujourd'hui. Juste l'essentiel.", author: "" },
+];
+
+function getDailyCitation() {
+  const dayIndex = Math.floor(Date.now() / 86400000) % citations.length;
+  return citations[dayIndex];
+}
+
+function renderCitation() {
+  const c = getDailyCitation();
+  const box = document.getElementById('citation-box');
+  if (!box) return;
+  box.innerHTML = `<div class="citation-card">
+    <div class="citation-text">"${c.text}"</div>
+    ${c.author ? `<div class="citation-author">— ${c.author}</div>` : ''}
+  </div>`;
+}
+
+// LISTE DE COURSES
+function addShopItem() {
+  const name = document.getElementById('shopItem').value.trim();
+  if (!name) return;
+  const qty = document.getElementById('shopQty').value.trim();
+  const cat = document.getElementById('shopCat').value;
+  data.shopping.push({ id: Date.now(), name, qty, cat, done: false });
+  document.getElementById('shopItem').value = '';
+  document.getElementById('shopQty').value = '';
+  save(); renderShopping();
+}
+
+function toggleShopItem(i) {
+  data.shopping[i].done = !data.shopping[i].done;
+  save(); renderShopping();
+}
+
+function clearCheckedItems() {
+  data.shopping = data.shopping.filter(s => !s.done);
+  save(); renderShopping();
+  showToast('Articles cochés supprimés ! 🛒');
+}
+
+function renderShopping() {
+  renderCitation();
+  const el = document.getElementById('shopping-list');
+  if (!data.shopping.length) { el.innerHTML = '<div class="empty-state">Ta liste de courses est vide 🛒</div>'; return; }
+  const cats = {};
+  data.shopping.forEach((item, i) => {
+    if (!cats[item.cat]) cats[item.cat] = [];
+    cats[item.cat].push({ ...item, idx: i });
+  });
+  let html = '';
+  Object.keys(cats).forEach(cat => {
+    html += `<div class="shop-category">${cat}</div>`;
+    cats[cat].forEach(item => {
+      html += `<div class="shop-item ${item.done ? 'checked' : ''}">
+        <input type="checkbox" class="check" ${item.done ? 'checked' : ''} onchange="toggleShopItem(${item.idx})" />
+        <span class="shop-name ${item.done ? 'done' : ''}">${item.name}</span>
+        ${item.qty ? `<span class="shop-qty">${item.qty}</span>` : ''}
+        <button class="icon-btn" onclick="deleteShopItem(${item.idx})">×</button>
+      </div>`;
+    });
+  });
+  el.innerHTML = html;
+}
+
+function deleteShopItem(i) { data.shopping.splice(i, 1); save(); renderShopping(); }
+
+// MÉDICAMENTS
+function addMed() {
+  const name = document.getElementById('medName').value.trim();
+  if (!name) return;
+  const horaires = [];
+  if (document.getElementById('medMatin').checked) horaires.push('Matin');
+  if (document.getElementById('medMidi').checked) horaires.push('Midi');
+  if (document.getElementById('medSoir').checked) horaires.push('Soir');
+  if (document.getElementById('medNuit').checked) horaires.push('Nuit');
+  if (!horaires.length) { showToast('Choisis au moins un horaire !'); return; }
+  data.meds.push({ id: Date.now(), name, horaires });
+  document.getElementById('medName').value = '';
+  ['medMatin','medMidi','medSoir','medNuit'].forEach(id => document.getElementById(id).checked = false);
+  save(); renderMeds();
+}
+
+function toggleMedDose(medId, horaire) {
+  const key = todayStr + '_' + medId + '_' + horaire;
+  if (!data.medsLog) data.medsLog = {};
+  data.medsLog[key] = !data.medsLog[key];
+  save(); renderMeds();
+  if (data.medsLog[key]) showToast('Prise notée ! 💊');
+}
+
+function renderMeds() {
+  const el = document.getElementById('meds-list');
+  if (!data.meds.length) { el.innerHTML = '<div class="empty-state">Aucun médicament enregistré.</div>'; return; }
+  if (!data.medsLog) data.medsLog = {};
+  el.innerHTML = data.meds.map((med, i) => {
+    const dosesHtml = med.horaires.map(h => {
+      const key = todayStr + '_' + med.id + '_' + h;
+      const taken = data.medsLog[key];
+      return `<button class="med-dose-btn ${taken ? 'taken' : ''}" onclick="toggleMedDose(${med.id}, '${h}')">${taken ? '✓' : ''} ${h}</button>`;
+    }).join('');
+    const allTaken = med.horaires.every(h => data.medsLog[todayStr + '_' + med.id + '_' + h]);
+    return `<div class="med-card" style="${allTaken ? 'border-color:var(--mint-mid);' : ''}">
+      <div class="med-header">
+        <div class="med-name">💊 ${med.name} ${allTaken ? '✅' : ''}</div>
+        <button class="icon-btn" onclick="deleteMed(${i})">×</button>
+      </div>
+      <div class="med-doses">${dosesHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+function deleteMed(i) { data.meds.splice(i, 1); save(); renderMeds(); }
+
 function deleteContact(i){data.contacts.splice(i,1);save();renderContacts();}
 
 renderTasks('today');
